@@ -38,27 +38,22 @@ class BlackCatalogCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeDebts = item.activeDebts;
-    final expiredDebts = item.expiredDebts;
-    final hasActiveDebt = activeDebts.isNotEmpty;
+    final validDebts = item.activeDebts;
+    final hasValidDebts = validDebts.isNotEmpty;
+    final isBlacklisted = item.isSwindler ?? false;
+    final isDebtStatus = !isBlacklisted && hasValidDebts;
 
-    // cardStatus из React-кода:
-    //   if (item.is_swindler) return 'blacklist';
-    //   if (hasActiveDebt)    return 'debt';
-    //   return 'blacklist';
-    final isDebtStatus = !(item.isSwindler ?? false) && hasActiveDebt;
-    final borderColor =
-        isDebtStatus ? const Color(0xFFF59E0B) : const Color(0xFFEF4444);
+    final borderColor = isDebtStatus
+        ? const Color(0xFFF59E0B)
+        : isBlacklisted
+        ? const Color(0xFFEF4444)
+        : const Color(0xFFD1D5DB);
     final gradientStart = Colors.white;
     final gradientEnd = isDebtStatus
         ? const Color(0xFFFFFBEB)
-        : const Color(0xFFFFF5F5);
-
-    final badgeText = isDebtStatus ? 'Оформлен' : 'Чёрный список';
-    final badgeBg =
-        isDebtStatus ? const Color(0xFFF59E0B) : const Color(0xFF000000);
-    final badgeFg =
-        isDebtStatus ? Colors.white : const Color(0xFFEF4444);
+        : isBlacklisted
+        ? const Color(0xFFFFF5F5)
+        : Colors.white;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -92,11 +87,18 @@ class BlackCatalogCard extends StatelessWidget {
                     // Бейдж сверху-слева + меню справа
                     Row(
                       children: [
-                        _Badge(
-                          text: badgeText,
-                          background: badgeBg,
-                          foreground: badgeFg,
-                        ),
+                        if (isBlacklisted)
+                          const _Badge(
+                            text: 'Чёрный список',
+                            background: Color(0xFF000000),
+                            foreground: Color(0xFFEF4444),
+                          ),
+                        if (isDebtStatus)
+                          const _Badge(
+                            text: 'Оформлен',
+                            background: Color(0xFFF59E0B),
+                            foreground: Colors.white,
+                          ),
                         const Spacer(),
                         if ((allowEdit && onEdit != null) ||
                             (allowDelete && onDelete != null))
@@ -150,14 +152,14 @@ class BlackCatalogCard extends StatelessWidget {
                           icon: Icons.badge_outlined,
                           label: 'ID',
                           value: item.id.toString(),
-                          isWarning: !isDebtStatus,
+                          isWarning: isBlacklisted,
                           isDebt: isDebtStatus,
                         ),
                         _InfoBlock(
                           icon: Icons.cake_outlined,
                           label: 'Дата рождения',
                           value: _formatDate(item.birthdate),
-                          isWarning: !isDebtStatus,
+                          isWarning: isBlacklisted,
                           isDebt: isDebtStatus,
                         ),
                         _InfoBlock(
@@ -166,7 +168,7 @@ class BlackCatalogCard extends StatelessWidget {
                           value: (item.doc?.isNotEmpty ?? false)
                               ? item.doc!
                               : 'Не указан',
-                          isWarning: !isDebtStatus,
+                          isWarning: isBlacklisted,
                           isDebt: isDebtStatus,
                         ),
                         _InfoBlock(
@@ -175,13 +177,13 @@ class BlackCatalogCard extends StatelessWidget {
                           value: (item.address?.isNotEmpty ?? false)
                               ? item.address!
                               : 'Не указан',
-                          isWarning: !isDebtStatus,
+                          isWarning: isBlacklisted,
                           isDebt: isDebtStatus,
                         ),
                       ],
                     ),
 
-                    if (activeDebts.isNotEmpty || expiredDebts.isNotEmpty) ...[
+                    if (hasValidDebts) ...[
                       const SizedBox(height: 12),
                       const Divider(height: 1, color: Color(0xFFD1D5DB)),
                       const SizedBox(height: 12),
@@ -189,11 +191,8 @@ class BlackCatalogCard extends StatelessWidget {
                         spacing: 10,
                         runSpacing: 10,
                         children: [
-                          ...activeDebts.map(
+                          ...validDebts.map(
                             (d) => _DebtBadge(debt: d, expired: false),
-                          ),
-                          ...expiredDebts.map(
-                            (d) => _DebtBadge(debt: d, expired: true),
                           ),
                         ],
                       ),

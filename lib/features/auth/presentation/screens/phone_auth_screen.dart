@@ -1,5 +1,6 @@
 import 'package:blacklist_plus_flutter/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:blacklist_plus_flutter/features/auth/presentation/widgets/call_confirmation_dialog.dart';
+import 'package:blacklist_plus_flutter/features/auth/presentation/widgets/name_required_dialog.dart';
 import 'package:blacklist_plus_flutter/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,6 +25,10 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
     filter: {"#": RegExp(r'\d')},
   );
   bool _isDialogShowing = false;
+  // Защита от повторного открытия модалки имени, пока она уже на экране
+  // (BlocConsumer.listener может сработать дважды — на одном и том же
+  // AuthNameRequired до и после rebuild).
+  bool _isNameDialogShowing = false;
 
   @override
   void initState() {
@@ -50,6 +55,26 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
       child: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           debugPrint('🎯 Состояние AuthCubit изменилось: $state');
+
+          // Сервер просит ФИО для регистрации (name_required:true).
+          // Аналог AuthNameModal в waypay_react_library: показываем
+          // модалку «Как вас зовут?», после ввода вызываем cubit.submitName,
+          // дальше cubit перейдёт в AuthCodeSent и откроется обычный диалог
+          // подтверждения звонка (точно как в React-флоу).
+          if (state is AuthNameRequired) {
+            debugPrint('🆕 name_required → показываем модалку имени');
+            if (!_isNameDialogShowing) {
+              _isNameDialogShowing = true;
+              final cubit = context.read<AuthCubit>();
+              WidgetsBinding.instance.addPostFrameCallback((_) async {
+                final name = await showNameRequiredDialog(context);
+                _isNameDialogShowing = false;
+                if (name != null && name.trim().isNotEmpty) {
+                  await cubit.submitName(name);
+                }
+              });
+            }
+          }
 
           if (state is AuthCodeSent) {
             debugPrint('📞 Показываем диалог подтверждения');
