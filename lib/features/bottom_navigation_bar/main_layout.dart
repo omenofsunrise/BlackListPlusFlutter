@@ -12,9 +12,7 @@ class MainLayout extends StatelessWidget {
 
   static const _navConfigs = [
     _NavItemConfig(icon: SvgIcons.calculator),
-    // Чёрный список — порт BlackCatalogPage из waypay-react.
     _NavItemConfig(icon: SvgIcons.notebook),
-    // Уведомления — порт NotificationsPage из waypay-react.
     _NavItemConfig(icon: SvgIcons.bell),
     _NavItemConfig(icon: SvgIcons.users),
   ];

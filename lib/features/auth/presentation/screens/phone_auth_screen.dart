@@ -25,9 +25,6 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
     filter: {"#": RegExp(r'\d')},
   );
   bool _isDialogShowing = false;
-  // Защита от повторного открытия модалки имени, пока она уже на экране
-  // (BlocConsumer.listener может сработать дважды — на одном и том же
-  // AuthNameRequired до и после rebuild).
   bool _isNameDialogShowing = false;
 
   @override
@@ -56,11 +53,6 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         listener: (context, state) {
           debugPrint('🎯 Состояние AuthCubit изменилось: $state');
 
-          // Сервер просит ФИО для регистрации (name_required:true).
-          // Аналог AuthNameModal в waypay_react_library: показываем
-          // модалку «Как вас зовут?», после ввода вызываем cubit.submitName,
-          // дальше cubit перейдёт в AuthCodeSent и откроется обычный диалог
-          // подтверждения звонка (точно как в React-флоу).
           if (state is AuthNameRequired) {
             debugPrint('🆕 name_required → показываем модалку имени');
             if (!_isNameDialogShowing) {
@@ -139,80 +131,78 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                          if (errorMessage != null) ...[
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFFF1F0),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: const Color(0xFFFFCCC7),
-                                ),
-                              ),
-                              child: Text(
-                                errorMessage,
-                                style: AppStyle.inter(
-                                  size: 14,
-                                  weight: FontWeight.w500,
-                                  color: const Color(0xFFCF1322),
-                                ),
+                        if (errorMessage != null) ...[
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFF1F0),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: const Color(0xFFFFCCC7),
                               ),
                             ),
-                            const SizedBox(height: 16),
-                          ],
-                          Text(
-                            'Регистрация / Авторизация',
-                            style: AppStyle.manrope(
-                              size: 24,
-                              weight: FontWeight.w600,
-                              color: const Color(AppColors.black),
+                            child: Text(
+                              errorMessage,
+                              style: AppStyle.inter(
+                                size: 14,
+                                weight: FontWeight.w500,
+                                color: const Color(0xFFCF1322),
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 36),
-                          ModalTextField(
-                            controller: _phoneController,
-                            focusNode: _phoneFocus,
-                            keyboardType: TextInputType.phone,
-                            inputFormatters: [_phoneFormatter],
-                            label: 'Номер телефона',
-                            prefixText: '+7',
-                            hintText: ' (___) ___-__-__',
+                          const SizedBox(height: 16),
+                        ],
+                        Text(
+                          'Регистрация / Авторизация',
+                          style: AppStyle.manrope(
+                            size: 24,
+                            weight: FontWeight.w600,
+                            color: const Color(AppColors.black),
                           ),
-                          const SizedBox(height: 18),
-                          isLoading
-                              ? const Center(child: CircularProgressIndicator())
-                              : DefaultButton(
-                                  text: 'Подтвердить',
-                                  isPrimary: true,
-                                  onPressed: () {
-                                    final digits =
-                                        _phoneFormatter.getUnmaskedText();
-                                    if (digits.length != 10) {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            'Номер должен состоять из 10 цифр',
-                                          ),
+                        ),
+                        const SizedBox(height: 36),
+                        ModalTextField(
+                          controller: _phoneController,
+                          focusNode: _phoneFocus,
+                          keyboardType: TextInputType.phone,
+                          inputFormatters: [_phoneFormatter],
+                          label: 'Номер телефона',
+                          prefixText: '+7',
+                          hintText: ' (___) ___-__-__',
+                        ),
+                        const SizedBox(height: 18),
+                        isLoading
+                            ? const Center(child: CircularProgressIndicator())
+                            : DefaultButton(
+                                text: 'Подтвердить',
+                                isPrimary: true,
+                                onPressed: () {
+                                  final digits = _phoneFormatter
+                                      .getUnmaskedText();
+                                  if (digits.length != 10) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Номер должен состоять из 10 цифр',
                                         ),
-                                      );
-                                      return;
-                                    }
-                                    final formattedPhone = '8$digits';
-                                    debugPrint(
-                                      '🔐 Начинаем авторизацию для: $formattedPhone',
+                                      ),
                                     );
-                                    context.read<AuthCubit>().startAuth(
-                                      formattedPhone,
-                                      widget.userType,
-                                    );
-                                  },
-                                ),
+                                    return;
+                                  }
+                                  final formattedPhone = '8$digits';
+                                  debugPrint(
+                                    '🔐 Начинаем авторизацию для: $formattedPhone',
+                                  );
+                                  context.read<AuthCubit>().startAuth(
+                                    formattedPhone,
+                                    widget.userType,
+                                  );
+                                },
+                              ),
                       ],
                     ),
                     const Spacer(),

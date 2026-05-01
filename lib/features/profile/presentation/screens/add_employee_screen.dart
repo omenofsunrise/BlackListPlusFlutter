@@ -276,17 +276,11 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
         curve: Curves.easeOut,
         child: ClipRRect(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          child: Material(
-            color: Colors.white,
-            child: content,
-          ),
+          child: Material(color: Colors.white, child: content),
         ),
       );
     }
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: content,
-    );
+    return Scaffold(backgroundColor: Colors.white, body: content);
   }
 }

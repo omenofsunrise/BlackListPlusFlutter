@@ -13,17 +13,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:waypay_flutter_library/waypay_styles.dart';
 
-/// Полный порт BlackCatalogPage из waypay-react.
-///
-/// Логика воспроизведена 1-в-1:
-///   • Поиск по ФИО, минимум 5 символов, debounce 300 мс.
-///   • До поиска — empty state с иконкой 📋 и подсказкой.
-///   • После поиска без результатов — empty state с 🔍 и текстом запроса.
-///   • Кнопка "+" → меню «Чёрный список / Оформленный» (на мобильном —
-///     bottom sheet, как в React при ширине ≤768px).
-///   • Long-press по карточке → контекст-меню «Редактировать / Добавить долг /
-///     Удалить» (в React это правый клик).
-///   • Нажатие на карточку → открыть досье.
 class BlackCatalogScreen extends StatefulWidget {
   const BlackCatalogScreen({super.key});
 
@@ -39,8 +28,6 @@ class _BlackCatalogScreenState extends State<BlackCatalogScreen> {
   String? _currentUserId;
   bool _isPrivilegedUser = false;
 
-  // Список «привилегированных» userId из BlackCatalogPageContent.tsx —
-  // для них canEditItem=true вне зависимости от creator_id.
   static const _privilegedUserIds = {
     'b3873201-0ae4-44ff-ba1f-de55daf8318b', // Аюб
     'bcec9c2b-5cee-4a1c-aac6-d0336ef59802', // Ибрагим
@@ -71,21 +58,18 @@ class _BlackCatalogScreenState extends State<BlackCatalogScreen> {
     try {
       final session = await getIt<AuthRemoteDataSource>().getSessionInfo();
       final clientRaw = session?['client'];
-      final client =
-          clientRaw is Map ? Map<String, dynamic>.from(clientRaw) : null;
+      final client = clientRaw is Map
+          ? Map<String, dynamic>.from(clientRaw)
+          : null;
       final id = (client?['id'] as String?) ?? '';
       if (!mounted) return;
       setState(() {
         _currentUserId = id;
         _isPrivilegedUser = _privilegedUserIds.contains(id);
       });
-    } catch (_) {
-      // тихо игнорируем — кнопки edit/delete просто не будут показаны
-    }
+    } catch (_) {}
   }
 
-  /// Логика canEditItem из React — пользователь может редактировать только
-  /// свои записи, либо если он в списке «привилегированных».
   bool _canEditItem(BlackCatalogItem item) {
     if (_isPrivilegedUser) return true;
     if (_currentUserId == null || _currentUserId!.isEmpty) return false;
@@ -128,31 +112,28 @@ class _BlackCatalogScreenState extends State<BlackCatalogScreen> {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Добавить',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
               const SizedBox(height: 8),
               ListTile(
-                leading: const Icon(Icons.add_box_outlined,
-                    color: Color(0xFF94A3B8)),
-                title: const Text('Чёрный список'),
-                onTap: () => Navigator.pop(
-                  ctx,
-                  BlackCatalogAddOption.blacklist,
+                leading: const Icon(
+                  Icons.add_box_outlined,
+                  color: Color(0xFF94A3B8),
                 ),
+                title: const Text('Чёрный список'),
+                onTap: () =>
+                    Navigator.pop(ctx, BlackCatalogAddOption.blacklist),
               ),
               ListTile(
-                leading: const Icon(Icons.description_outlined,
-                    color: Color(0xFF64748B)),
-                title: const Text('Оформленный'),
-                onTap: () => Navigator.pop(
-                  ctx,
-                  BlackCatalogAddOption.completed,
+                leading: const Icon(
+                  Icons.description_outlined,
+                  color: Color(0xFF64748B),
                 ),
+                title: const Text('Оформленный'),
+                onTap: () =>
+                    Navigator.pop(ctx, BlackCatalogAddOption.completed),
               ),
               const SizedBox(height: 12),
             ],
@@ -183,8 +164,10 @@ class _BlackCatalogScreenState extends State<BlackCatalogScreen> {
   }
 
   Future<void> _editItem(BlackCatalogItem item) async {
-    final result =
-        await showBlackCatalogFormModal(context: context, editing: item);
+    final result = await showBlackCatalogFormModal(
+      context: context,
+      editing: item,
+    );
     if (result == null) return;
     try {
       await _cubit.updateItem(
@@ -247,10 +230,7 @@ class _BlackCatalogScreenState extends State<BlackCatalogScreen> {
   }
 
   void _openDossier(BlackCatalogItem item) {
-    context.pushNamed(
-      Routes.blackCatalogDossierScreen.toName,
-      extra: item,
-    );
+    context.pushNamed(Routes.blackCatalogDossierScreen.toName, extra: item);
   }
 
   Future<void> _showItemMenu(BlackCatalogItem item) async {
@@ -288,8 +268,10 @@ class _BlackCatalogScreenState extends State<BlackCatalogScreen> {
             ),
             if (canEdit)
               ListTile(
-                leading: const Icon(Icons.delete_outline,
-                    color: Color(0xFFEF4444)),
+                leading: const Icon(
+                  Icons.delete_outline,
+                  color: Color(0xFFEF4444),
+                ),
                 title: const Text(
                   'Удалить',
                   style: TextStyle(color: Color(0xFFEF4444)),
@@ -318,9 +300,9 @@ class _BlackCatalogScreenState extends State<BlackCatalogScreen> {
 
   void _showError(String message) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -339,10 +321,10 @@ class _BlackCatalogScreenState extends State<BlackCatalogScreen> {
             children: [
               _buildHeader(context),
               Expanded(
-                child: BlocBuilder<BlackCatalogListCubit,
-                    BlackCatalogListState>(
-                  builder: (context, state) => _buildBody(state),
-                ),
+                child:
+                    BlocBuilder<BlackCatalogListCubit, BlackCatalogListState>(
+                      builder: (context, state) => _buildBody(state),
+                    ),
               ),
             ],
           ),

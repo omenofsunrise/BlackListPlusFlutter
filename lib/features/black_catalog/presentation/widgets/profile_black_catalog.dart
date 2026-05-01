@@ -7,30 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:waypay_flutter_library/waypay_styles.dart';
 
-/// Порт компонента ProfileBlackCatalog.tsx из waypay-react.
-///
-/// Поведение 1-в-1:
-///   • Поисковая строка с минимумом 5 символов и debounce 300 мс.
-///   • Загрузка GET /black-catalog/search?mine=true&...
-///   • Бесконечная подгрузка по next_page_token при прокрутке вниз
-///     (аналог IntersectionObserver на loadMoreTriggerRef).
-///   • Удаление с подтверждением.
-///   • Пустое состояние с подсказкой по поиску.
-///
-/// ВАЖНО: подписку и блок продления НЕ переносим (по требованию).
 class ProfileBlackCatalog extends StatefulWidget {
-  /// Размер страницы (по умолчанию 10 — как в React).
   final int pageSize;
 
-  /// Разрешено ли редактировать/удалять записи (true для собственных записей).
   final bool allowEdit;
 
-  /// Колбек открытия досье карточки. Если null — карточка кликабельна, но
-  /// ничего не делает. (Полный экран досье — отдельная задача.)
   final void Function(BlackCatalogItem item)? onOpenDossier;
 
-  /// Колбек редактирования (модалка). Если null — пункт «Редактировать»
-  /// в меню карточки скрывается.
   final void Function(BlackCatalogItem item)? onEdit;
 
   const ProfileBlackCatalog({
@@ -65,14 +48,10 @@ class _ProfileBlackCatalogState extends State<ProfileBlackCatalog> {
     super.dispose();
   }
 
-  /// Бесконечная подгрузка через NotificationListener — слушаем скролл родителя
-  /// (наш ListView внутри shrinkWrap не двигается, поэтому нужен ancestor scroll).
   bool _onScrollNotification(ScrollNotification notification) {
     if (notification is ScrollUpdateNotification ||
         notification is ScrollEndNotification) {
       final metrics = notification.metrics;
-      // rootMargin "100px" из React + небольшой запас — стартуем подгрузку,
-      // когда до низа остаётся не более 200 px.
       if (metrics.pixels >= metrics.maxScrollExtent - 200) {
         _cubit.loadMore();
       }
@@ -83,7 +62,6 @@ class _ProfileBlackCatalogState extends State<ProfileBlackCatalog> {
   void _onSearchChanged(String value) {
     _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 300), () {
-      // В React loadMyBlacklist срабатывает только при length >= 5 или == 0.
       if (value.isEmpty || value.length >= 5) {
         _cubit.loadInitial(query: value);
       }
@@ -119,9 +97,9 @@ class _ProfileBlackCatalogState extends State<ProfileBlackCatalog> {
         await _cubit.deleteItem(item.id);
       } catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Ошибка при удалении: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Ошибка при удалении: $e')));
       }
     }
   }
@@ -247,8 +225,6 @@ class _ProfileBlackCatalogState extends State<ProfileBlackCatalog> {
       itemCount: state.items.length + (state.hasMore ? 1 : 0),
       itemBuilder: (context, index) {
         if (index >= state.items.length) {
-          // Триггер бесконечной подгрузки + индикатор.
-          // Триггер сам активируется через _onScroll() выше.
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Center(

@@ -299,7 +299,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           ),
         ),
         build: (context) => [
-          // Header
           card(
             pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -496,7 +495,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   ],
                 ),
                 pw.SizedBox(height: 20),
-                // строки результатов
                 _pdfRow(
                   'Общая стоимость',
                   '$displayTotal ₽',
@@ -518,7 +516,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                   textDark,
                 ),
                 pw.SizedBox(height: 20),
-                // полоса доля долга/переплаты
                 pw.Container(
                   height: 10,
                   decoration: pw.BoxDecoration(

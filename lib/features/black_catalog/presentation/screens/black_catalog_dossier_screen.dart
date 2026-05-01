@@ -9,19 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-/// Полный порт BlackCatalogDossier.tsx из waypay-react.
-///
-/// Что отображается:
-///   • Кнопка «Назад к поиску».
-///   • Заголовок: ФИО, ID, бейдж статуса (Чёрный список/Есть оформления).
-///   • Секция «Общая информация» (дата рождения, адрес, документ).
-///   • Секция «Оформления» — активные и просроченные долги. Свои долги
-///     можно удалить (проверка по creator_id == userId).
-///   • Секция «Комментарии» — список + поле добавления + редактирование/
-///     удаление своих комментариев.
 class BlackCatalogDossierScreen extends StatefulWidget {
-  /// Запись, по которой открыто досье. Перезагрузка свежих данных
-  /// (например, после удаления долга) идёт через searchEntries(id=...).
   final BlackCatalogItem initialItem;
 
   const BlackCatalogDossierScreen({super.key, required this.initialItem});
@@ -31,8 +19,7 @@ class BlackCatalogDossierScreen extends StatefulWidget {
       _BlackCatalogDossierScreenState();
 }
 
-class _BlackCatalogDossierScreenState
-    extends State<BlackCatalogDossierScreen> {
+class _BlackCatalogDossierScreenState extends State<BlackCatalogDossierScreen> {
   late BlackCatalogItem _item;
   String? _currentUserId;
 
@@ -50,12 +37,13 @@ class _BlackCatalogDossierScreenState
     try {
       final session = await getIt<AuthRemoteDataSource>().getSessionInfo();
       final clientRaw = session?['client'];
-      final client =
-          clientRaw is Map ? Map<String, dynamic>.from(clientRaw) : null;
+      final client = clientRaw is Map
+          ? Map<String, dynamic>.from(clientRaw)
+          : null;
       final id = (client?['id'] as String?) ?? '';
       if (!mounted) return;
       setState(() => _currentUserId = id);
-    } catch (_) {/* ignore */}
+    } catch (_) {}
   }
 
   Future<void> _refreshItem() async {
@@ -65,7 +53,7 @@ class _BlackCatalogDossierScreenState
         if (!mounted) return;
         setState(() => _item = response.blackCatalogs.first);
       }
-    } catch (_) {/* ignore */}
+    } catch (_) {}
   }
 
   Future<void> _deleteDebt(int debtId) async {
@@ -95,9 +83,9 @@ class _BlackCatalogDossierScreenState
       await _refreshItem();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Не удалось удалить долг: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Не удалось удалить долг: $e')));
     }
   }
 
@@ -122,7 +110,6 @@ class _BlackCatalogDossierScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // BackButton — «Назад к поиску»
               TextButton.icon(
                 onPressed: () => Navigator.of(context).pop(),
                 icon: const Icon(Icons.arrow_back),
@@ -137,7 +124,6 @@ class _BlackCatalogDossierScreenState
               ),
               const SizedBox(height: 8),
 
-              // Заголовок: ФИО, ID, бейдж статуса
               Text(
                 _item.fullname,
                 style: const TextStyle(
@@ -149,16 +135,12 @@ class _BlackCatalogDossierScreenState
               const SizedBox(height: 4),
               Text(
                 'ID: ${_item.id}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF9CA3AF),
-                ),
+                style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF)),
               ),
               const SizedBox(height: 10),
               _StatusBadge(isBlacklist: isBlacklist),
               const SizedBox(height: 18),
 
-              // Секция «Общая информация»
               const _SectionTitle('Общая информация'),
               const SizedBox(height: 8),
               Wrap(
@@ -190,7 +172,6 @@ class _BlackCatalogDossierScreenState
                 ],
               ),
 
-              // Секция «Оформления» (долги)
               if (activeDebts.isNotEmpty || expiredDebts.isNotEmpty) ...[
                 const SizedBox(height: 18),
                 const Divider(color: Color(0xFFD1D5DB)),
@@ -221,7 +202,6 @@ class _BlackCatalogDossierScreenState
                 ),
               ],
 
-              // Секция «Комментарии»
               const SizedBox(height: 24),
               const _SectionTitle('Комментарии'),
               const SizedBox(height: 8),
@@ -287,8 +267,8 @@ class _InfoCell extends StatelessWidget {
     final color = isWarning
         ? const Color(0xFFEF4444)
         : isDebt
-            ? const Color(0xFFB45309)
-            : const Color(0xFF111827);
+        ? const Color(0xFFB45309)
+        : const Color(0xFF111827);
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 140),
       child: Column(
@@ -330,10 +310,11 @@ class _StatusBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
         boxShadow: [
           BoxShadow(
-            color: (isBlacklist
-                    ? const Color(0xFFEF4444)
-                    : const Color(0xFFF59E0B))
-                .withOpacity(0.5),
+            color:
+                (isBlacklist
+                        ? const Color(0xFFEF4444)
+                        : const Color(0xFFF59E0B))
+                    .withOpacity(0.5),
             blurRadius: 12,
             offset: const Offset(0, 2),
           ),
@@ -371,10 +352,9 @@ class _DebtBadgeRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final bg = expired ? const Color(0xFF9CA3AF) : const Color(0xFFFEF3C7);
     final fg = expired ? const Color(0xFF4B5563) : const Color(0xFFB45309);
-    final border =
-        expired ? const Color(0xFFD1D5DB) : const Color(0xFFFDE68A);
+    final border = expired ? const Color(0xFFD1D5DB) : const Color(0xFFFDE68A);
     final dateStr = _formatDate(debt.debtEndingAt);
-    final label = expired ? 'просрочено $dateStr' : 'до $dateStr';
+    final label = expired ? 'закрыто $dateStr' : 'до $dateStr';
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -407,11 +387,7 @@ class _DebtBadgeRow extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
               child: const Padding(
                 padding: EdgeInsets.all(4),
-                child: Icon(
-                  Icons.close,
-                  size: 14,
-                  color: Color(0xFFEF4444),
-                ),
+                child: Icon(Icons.close, size: 14, color: Color(0xFFEF4444)),
               ),
             ),
           ],
@@ -608,19 +584,13 @@ class _CommentsSectionState extends State<_CommentsSection> {
                   onPressed: () => _saveEdit(cubit),
                   child: const Text('Сохранить'),
                 ),
-                TextButton(
-                  onPressed: _cancelEdit,
-                  child: const Text('Отмена'),
-                ),
+                TextButton(onPressed: _cancelEdit, child: const Text('Отмена')),
               ],
             ),
           ] else ...[
             Text(
               comment.content,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF111827),
-              ),
+              style: const TextStyle(fontSize: 14, color: Color(0xFF111827)),
             ),
             if (canModify) ...[
               const SizedBox(height: 8),

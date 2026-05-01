@@ -12,9 +12,6 @@ class BlackCatalogListLoading extends BlackCatalogListState {
   const BlackCatalogListLoading();
 }
 
-/// Пустое состояние:
-///   • [hasSearched]=false → поиск ещё не выполняли (показываем подсказку).
-///   • [hasSearched]=true  → выполнили поиск, но ничего не нашли.
 class BlackCatalogListEmpty extends BlackCatalogListState {
   final int? totalCount;
   final bool hasSearched;

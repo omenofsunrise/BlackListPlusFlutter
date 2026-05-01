@@ -3,12 +3,6 @@ import 'package:blacklist_plus_flutter/features/black_catalog/data/models/debt.d
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-/// Порт BlackCatalogCard.tsx из waypay-react.
-///
-/// Логика статуса карточки повторена 1-в-1:
-///   • is_swindler → 'blacklist' (красный)
-///   • есть активный долг → 'debt' (жёлтый)
-///   • иначе → 'blacklist' (так в исходнике, см. cardStatus useMemo)
 class BlackCatalogCard extends StatelessWidget {
   final BlackCatalogItem item;
   final VoidCallback? onTap;
@@ -42,6 +36,9 @@ class BlackCatalogCard extends StatelessWidget {
     final hasValidDebts = validDebts.isNotEmpty;
     final isBlacklisted = item.isSwindler ?? false;
     final isDebtStatus = !isBlacklisted && hasValidDebts;
+    final hasStatusBadge = isBlacklisted || isDebtStatus;
+    final hasActions =
+        (allowEdit && onEdit != null) || (allowDelete && onDelete != null);
 
     final borderColor = isDebtStatus
         ? const Color(0xFFF59E0B)
@@ -79,60 +76,59 @@ class BlackCatalogCard extends StatelessWidget {
           ),
           child: Stack(
             children: [
+              if (hasActions)
+                Positioned(
+                  top: 8,
+                  right: 4,
+                  child: PopupMenuButton<String>(
+                    tooltip: 'Действия',
+                    icon: const Icon(Icons.more_vert, color: Color(0xFF6B7280)),
+                    onSelected: (value) {
+                      if (value == 'edit') onEdit?.call();
+                      if (value == 'delete') onDelete?.call();
+                    },
+                    itemBuilder: (_) => [
+                      if (allowEdit && onEdit != null)
+                        const PopupMenuItem(
+                          value: 'edit',
+                          child: Text('Редактировать'),
+                        ),
+                      if (allowDelete && onDelete != null)
+                        const PopupMenuItem(
+                          value: 'delete',
+                          child: Text(
+                            'Удалить',
+                            style: TextStyle(color: Color(0xFFEF4444)),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                padding: const EdgeInsets.fromLTRB(16, 16, 56, 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Бейдж сверху-слева + меню справа
-                    Row(
-                      children: [
-                        if (isBlacklisted)
-                          const _Badge(
-                            text: 'Чёрный список',
-                            background: Color(0xFF000000),
-                            foreground: Color(0xFFEF4444),
-                          ),
-                        if (isDebtStatus)
-                          const _Badge(
-                            text: 'Оформлен',
-                            background: Color(0xFFF59E0B),
-                            foreground: Colors.white,
-                          ),
-                        const Spacer(),
-                        if ((allowEdit && onEdit != null) ||
-                            (allowDelete && onDelete != null))
-                          PopupMenuButton<String>(
-                            tooltip: 'Действия',
-                            icon: const Icon(
-                              Icons.more_vert,
-                              color: Color(0xFF6B7280),
+                    if (hasStatusBadge) ...[
+                      Row(
+                        children: [
+                          if (isBlacklisted)
+                            const _Badge(
+                              text: 'Чёрный список',
+                              background: Color(0xFF000000),
+                              foreground: Color(0xFFEF4444),
                             ),
-                            onSelected: (value) {
-                              if (value == 'edit') onEdit?.call();
-                              if (value == 'delete') onDelete?.call();
-                            },
-                            itemBuilder: (_) => [
-                              if (allowEdit && onEdit != null)
-                                const PopupMenuItem(
-                                  value: 'edit',
-                                  child: Text('Редактировать'),
-                                ),
-                              if (allowDelete && onDelete != null)
-                                const PopupMenuItem(
-                                  value: 'delete',
-                                  child: Text(
-                                    'Удалить',
-                                    style: TextStyle(color: Color(0xFFEF4444)),
-                                  ),
-                                ),
-                            ],
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
+                          if (isDebtStatus)
+                            const _Badge(
+                              text: 'Оформлен',
+                              background: Color(0xFFF59E0B),
+                              foreground: Colors.white,
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                    ],
 
-                    // ФИО — название карточки
                     Text(
                       item.fullname.isEmpty ? 'Не указано' : item.fullname,
                       style: const TextStyle(
@@ -143,7 +139,6 @@ class BlackCatalogCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
 
-                    // Информационная сетка (ID, дата рождения, документ, адрес)
                     Wrap(
                       spacing: 16,
                       runSpacing: 12,
@@ -265,8 +260,8 @@ class _InfoBlock extends StatelessWidget {
     final color = isWarning
         ? const Color(0xFFEF4444)
         : isDebt
-            ? const Color(0xFFB45309)
-            : const Color(0xFF111827);
+        ? const Color(0xFFB45309)
+        : const Color(0xFF111827);
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 140),
       child: Column(
@@ -280,10 +275,7 @@ class _InfoBlock extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 label,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF6B7280),
-                ),
+                style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
               ),
             ],
           ),
@@ -331,7 +323,7 @@ class _DebtBadge extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            expired ? 'просрочен $dateStr' : 'до $dateStr',
+            expired ? 'закрыто $dateStr' : 'до $dateStr',
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,

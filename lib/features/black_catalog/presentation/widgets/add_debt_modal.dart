@@ -2,15 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:waypay_flutter_library/waypay_styles.dart';
 
-/// Порт компонента AddDebtModal.tsx из waypay-react.
-///
-/// Одно поле — дата окончания долга в формате ДД.ММ.ГГГГ. Валидация:
-///   • поле не пустое
-///   • дата корректная (правильный формат ДД.ММ.ГГГГ)
-///   • дата не в прошлом (как в React: parsedDate < today → ошибка)
-///
-/// Возвращает выбранную дату через `Navigator.pop(context, date)`.
-/// Если пользователь закрыл диалог — `null`.
 Future<DateTime?> showAddDebtModal({
   required BuildContext context,
   required String itemName,
@@ -41,8 +32,6 @@ class _AddDebtDialogState extends State<_AddDebtDialog> {
     super.dispose();
   }
 
-  /// Форматирование под маску ДД.ММ.ГГГГ — повторяет handleDateTextChange
-  /// из React (slice 8 цифр и расстановка точек).
   void _onChanged(String value) {
     final digits = value.replaceAll(RegExp(r'\D'), '');
     final clipped = digits.length > 8 ? digits.substring(0, 8) : digits;
@@ -71,7 +60,6 @@ class _AddDebtDialogState extends State<_AddDebtDialog> {
     final year = int.parse(match.group(3)!);
     try {
       final date = DateTime(year, month, day);
-      // Защита от невалидных дат (например 31.02): DateTime их «нормализует».
       if (date.day != day || date.month != month || date.year != year) {
         return null;
       }
@@ -89,9 +77,7 @@ class _AddDebtDialogState extends State<_AddDebtDialog> {
     }
     final parsed = _parseDate(input);
     if (parsed == null) {
-      setState(
-        () => _error = 'Неверный формат даты. Используйте ДД.ММ.ГГГГ',
-      );
+      setState(() => _error = 'Неверный формат даты. Используйте ДД.ММ.ГГГГ');
       return;
     }
     final today = DateTime.now();
@@ -115,10 +101,7 @@ class _AddDebtDialogState extends State<_AddDebtDialog> {
           if (widget.itemName.isNotEmpty) ...[
             Text(
               widget.itemName,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF6B7280),
-              ),
+              style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
             ),
             const SizedBox(height: 12),
           ],

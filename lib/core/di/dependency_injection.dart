@@ -28,8 +28,6 @@ Future<void> initDependencies() async {
   getIt.registerLazySingleton<EmployeeRemoteDataSource>(
     () => EmployeeRemoteDataSourceImpl(getIt<Dio>()),
   );
-  // Чёрный каталог: GET /black-catalog/search, DELETE /black-catalog/{id},
-  // PUT /black-catalog/{id}. Используется в ProfileBlackCatalog (страница профиля).
   getIt.registerLazySingleton<BlackCatalogRemoteDataSource>(
     () => BlackCatalogRemoteDataSourceImpl(getIt<Dio>()),
   );

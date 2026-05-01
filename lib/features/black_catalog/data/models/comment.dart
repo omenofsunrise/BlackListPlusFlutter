@@ -1,5 +1,3 @@
-/// Комментарий к записи чёрного каталога. Соответствует структуре,
-/// возвращаемой `BlackCatalogService.getComments` из waypay-react.
 class CatalogComment {
   final String id;
   final String content;

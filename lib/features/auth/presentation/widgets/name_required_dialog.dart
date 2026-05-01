@@ -1,19 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:waypay_flutter_library/waypay_styles.dart';
 
-/// Порт компонента AuthNameModal из waypay_react_library
-/// (минифицированный исходник, функция `qr` ≈ строки 4162–4248).
-///
-/// Что воспроизведено 1-в-1:
-///   • Заголовок «Как вас зовут?» (черный, 27px, FontWeight.w600 — как
-///     `Qr` styled-component).
-///   • Однострочное поле с плейсхолдером «Иванов Иван Иванович», автофокус.
-///   • Кнопка-стрелка «→» справа: бирюзовая (#007D88), отключена при пустом
-///     значении и во время сабмита.
-///   • Белая карточка 30px padding, скруглённые углы, тень.
-///
-/// Возвращает введённое ФИО через `Navigator.pop(name)`. При закрытии без
-/// сабмита — `null`.
 Future<String?> showNameRequiredDialog(BuildContext context) {
   return showDialog<String>(
     context: context,

@@ -5,26 +5,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'my_black_catalog_state.dart';
 
-/// Cubit для блока «Мой чёрный список» в профиле.
-///
-/// Повторяет поведение ProfileBlackCatalog.tsx из React:
-///   • Поиск по ФИО (минимум 5 символов, debounce 300 мс — реализуется на UI).
-///   • Загрузка списка через GET /black-catalog/search?mine=true.
-///   • Пагинация next_page_token + бесконечная подгрузка.
-///   • Удаление записи с обновлением списка.
 class MyBlackCatalogCubit extends Cubit<MyBlackCatalogState> {
-  MyBlackCatalogCubit({this.pageSize = 10}) : super(const MyBlackCatalogInitial());
+  MyBlackCatalogCubit({this.pageSize = 10})
+    : super(const MyBlackCatalogInitial());
 
   final BlackCatalogRemoteDataSource _dataSource =
       getIt<BlackCatalogRemoteDataSource>();
 
-  /// Размер страницы — в React по умолчанию 10.
   final int pageSize;
 
   String _query = '';
 
-  /// Загрузка/перезагрузка с нуля. Вызывается при первом открытии и при
-  /// изменении поискового запроса (длиной 0 или ≥ 5 символов).
   Future<void> loadInitial({String query = ''}) async {
     _query = query;
     emit(const MyBlackCatalogLoading());
@@ -38,7 +29,8 @@ class MyBlackCatalogCubit extends Cubit<MyBlackCatalogState> {
       emit(
         MyBlackCatalogLoaded(
           items: response.blackCatalogs,
-          hasMore: response.nextPageToken != null &&
+          hasMore:
+              response.nextPageToken != null &&
               response.nextPageToken!.isNotEmpty,
           nextPageToken: response.nextPageToken,
           query: query,
@@ -49,7 +41,6 @@ class MyBlackCatalogCubit extends Cubit<MyBlackCatalogState> {
     }
   }
 
-  /// Подгрузка следующей страницы по next_page_token.
   Future<void> loadMore() async {
     final current = state;
     if (current is! MyBlackCatalogLoaded) return;
@@ -70,21 +61,18 @@ class MyBlackCatalogCubit extends Cubit<MyBlackCatalogState> {
       emit(
         MyBlackCatalogLoaded(
           items: [...current.items, ...response.blackCatalogs],
-          hasMore: response.nextPageToken != null &&
+          hasMore:
+              response.nextPageToken != null &&
               response.nextPageToken!.isNotEmpty,
           nextPageToken: response.nextPageToken,
           query: _query,
         ),
       );
     } catch (e) {
-      // Не уходим в error-стейт целиком — просто откатываем флаг загрузки и
-      // оставляем уже загруженные элементы. В React тоже только console.error.
       emit(current.copyWith(isLoadingMore: false));
     }
   }
 
-  /// Удаление записи. После успеха — перезагружаем список с текущим запросом
-  /// (как в React: после deleteEntry вызывается loadMyBlacklist(null, false)).
   Future<void> deleteItem(int id) async {
     final current = state;
     try {
@@ -98,7 +86,6 @@ class MyBlackCatalogCubit extends Cubit<MyBlackCatalogState> {
     await loadInitial(query: _query);
   }
 
-  /// Обновление записи (вызывается из модалки редактирования).
   Future<void> updateItem({
     required int id,
     required String fullname,

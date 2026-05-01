@@ -5,11 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'comments_state.dart';
 
-/// Cubit комментариев досье. Аналог логики работы с комментариями в
-/// BlackCatalogDossier.tsx.
 class CommentsCubit extends Cubit<CommentsState> {
   CommentsCubit({required this.blacklistId, required this.currentUserId})
-      : super(const CommentsLoading());
+    : super(const CommentsLoading());
 
   final int blacklistId;
   final String currentUserId;

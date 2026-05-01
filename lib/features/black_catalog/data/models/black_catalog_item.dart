@@ -1,9 +1,5 @@
 import 'package:blacklist_plus_flutter/features/black_catalog/data/models/debt.dart';
 
-/// Запись в чёрном каталоге.
-///
-/// Соответствует BlackCatalogItem из waypay-react:
-/// blacklist-plus/src/api/BlackCatalog/blackCatalog.ts.
 class BlackCatalogItem {
   final int id;
   final String fullname;
@@ -53,7 +49,6 @@ class BlackCatalogItem {
     );
   }
 
-  /// Активные долги (debt_ending_at >= сегодня, на уровне суток).
   List<Debt> get activeDebts {
     final now = DateTime.now();
     final todayStart = DateTime(now.year, now.month, now.day);
@@ -65,7 +60,6 @@ class BlackCatalogItem {
     }).toList();
   }
 
-  /// Просроченные долги.
   List<Debt> get expiredDebts {
     final now = DateTime.now();
     final todayStart = DateTime(now.year, now.month, now.day);

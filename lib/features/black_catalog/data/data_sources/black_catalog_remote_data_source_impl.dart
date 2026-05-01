@@ -4,7 +4,6 @@ import 'package:blacklist_plus_flutter/features/black_catalog/data/models/notifi
 import 'package:blacklist_plus_flutter/features/black_catalog/data/models/search_response.dart';
 import 'package:dio/dio.dart';
 
-/// Реализация поверх Dio. Аналог BlackCatalogService из waypay-react.
 class BlackCatalogRemoteDataSourceImpl implements BlackCatalogRemoteDataSource {
   final Dio dio;
 
@@ -22,7 +21,6 @@ class BlackCatalogRemoteDataSourceImpl implements BlackCatalogRemoteDataSource {
   }) async {
     final query = <String, dynamic>{};
     if (name != null && name.isNotEmpty) {
-      // BlackCatalogService.search дублирует имя в name+fullname.
       query['name'] = name;
       query['fullname'] = name;
     }
@@ -40,7 +38,10 @@ class BlackCatalogRemoteDataSourceImpl implements BlackCatalogRemoteDataSource {
     }
 
     try {
-      final response = await dio.get('$_basePath/search', queryParameters: query);
+      final response = await dio.get(
+        '$_basePath/search',
+        queryParameters: query,
+      );
       final data = response.data;
       if (data is Map) {
         return SearchBlackCatalogResponse.fromJson(
@@ -74,10 +75,6 @@ class BlackCatalogRemoteDataSourceImpl implements BlackCatalogRemoteDataSource {
     bool? isSwindler,
     String? debtEndingAt,
   }) async {
-    // В React BlackCatalogService.create использует FormData (для файлов
-    // паспорта). У нас файлы пока не поддерживаются — отправляем JSON.
-    // Если бэкенд требует строго multipart, можно перейти на FormData
-    // позже без изменения UI.
     final body = <String, dynamic>{
       'fullname': fullname,
       'doc': doc,
@@ -99,8 +96,6 @@ class BlackCatalogRemoteDataSourceImpl implements BlackCatalogRemoteDataSource {
         final id = data['id'];
         if (id is num) return id.toInt();
       }
-      // Если сервер не вернул id, возвращаем 0 — фронт всё равно сделает
-      // refresh списка через search().
       return 0;
     } on DioException catch (e) {
       throw Exception(_extractErrorMessage(e, 'Не удалось создать запись'));
@@ -164,7 +159,6 @@ class BlackCatalogRemoteDataSourceImpl implements BlackCatalogRemoteDataSource {
         '$_basePath/debt',
         data: {
           'blacklist_id': blacklistId,
-          // ISO-8601 — бэкенду на сайте отдаётся такой же Date.
           'debt_ending_at': debtEndingAt.toUtc().toIso8601String(),
         },
       );
@@ -223,7 +217,9 @@ class BlackCatalogRemoteDataSourceImpl implements BlackCatalogRemoteDataSource {
         data: {'content': content},
       );
     } on DioException catch (e) {
-      throw Exception(_extractErrorMessage(e, 'Не удалось добавить комментарий'));
+      throw Exception(
+        _extractErrorMessage(e, 'Не удалось добавить комментарий'),
+      );
     }
   }
 
@@ -232,7 +228,9 @@ class BlackCatalogRemoteDataSourceImpl implements BlackCatalogRemoteDataSource {
     try {
       await dio.put('/comments/$commentId', data: {'content': content});
     } on DioException catch (e) {
-      throw Exception(_extractErrorMessage(e, 'Не удалось обновить комментарий'));
+      throw Exception(
+        _extractErrorMessage(e, 'Не удалось обновить комментарий'),
+      );
     }
   }
 
@@ -241,7 +239,9 @@ class BlackCatalogRemoteDataSourceImpl implements BlackCatalogRemoteDataSource {
     try {
       await dio.delete('$_basePath/$blacklistId/comments/$commentId');
     } on DioException catch (e) {
-      throw Exception(_extractErrorMessage(e, 'Не удалось удалить комментарий'));
+      throw Exception(
+        _extractErrorMessage(e, 'Не удалось удалить комментарий'),
+      );
     }
   }
 
@@ -258,9 +258,7 @@ class BlackCatalogRemoteDataSourceImpl implements BlackCatalogRemoteDataSource {
       );
       final data = response.data;
       if (data is Map) {
-        return NotificationsResponse.fromJson(
-          Map<String, dynamic>.from(data),
-        );
+        return NotificationsResponse.fromJson(Map<String, dynamic>.from(data));
       }
       return const NotificationsResponse(notifications: []);
     } on DioException catch (e) {

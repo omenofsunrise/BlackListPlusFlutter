@@ -102,8 +102,6 @@ class AppRouter {
               ),
             ],
           ),
-          // Вкладка «Чёрный список» (порт BlackCatalogPage из waypay-react).
-          // Должна совпадать по индексу с _navConfigs[1] в main_layout.dart.
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -113,8 +111,6 @@ class AppRouter {
               ),
             ],
           ),
-          // Вкладка «Уведомления» (порт NotificationsPage из waypay-react).
-          // Должна совпадать по индексу с _navConfigs[2] в main_layout.dart.
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -166,10 +162,6 @@ class AppRouter {
           return ProfileStatisticsScreen(employeeId: employeeId);
         },
       ),
-      // Досье записи чёрного каталога — открывается тапом по карточке.
-      // Это отдельный экран ВНЕ shell-роута: он перекрывает нижний бар, как
-      // и другие "детали" (active sessions, employees и т.д.). Принимает
-      // BlackCatalogItem через `extra`.
       GoRoute(
         path: Routes.blackCatalogDossierScreen.toPath,
         name: Routes.blackCatalogDossierScreen.toName,

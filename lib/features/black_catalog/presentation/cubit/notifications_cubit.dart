@@ -5,20 +5,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'notifications_state.dart';
 
-/// Cubit для NotificationsScreen — порт логики NotificationsPage.tsx из
-/// waypay-react.
-///
-/// Поведение 1-в-1:
-///   • Первая загрузка — GET /black-catalog/notifications.
-///   • Подгрузка по next_page_token при прокрутке вниз.
-///   • markAsRead меняет статус и перезагружает текущий список.
 class NotificationsCubit extends Cubit<NotificationsState> {
   NotificationsCubit() : super(const NotificationsLoading());
 
   final BlackCatalogRemoteDataSource _dataSource =
       getIt<BlackCatalogRemoteDataSource>();
 
-  /// Полная перезагрузка списка с первой страницы.
   Future<void> loadInitial() async {
     emit(const NotificationsLoading());
     try {
@@ -26,7 +18,8 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       emit(
         NotificationsLoaded(
           items: response.notifications,
-          hasMore: response.nextPageToken != null &&
+          hasMore:
+              response.nextPageToken != null &&
               response.nextPageToken!.isNotEmpty,
           nextPageToken: response.nextPageToken,
         ),
@@ -36,7 +29,6 @@ class NotificationsCubit extends Cubit<NotificationsState> {
     }
   }
 
-  /// Подгрузка следующей страницы.
   Future<void> loadMore() async {
     final current = state;
     if (current is! NotificationsLoaded) return;
@@ -50,18 +42,17 @@ class NotificationsCubit extends Cubit<NotificationsState> {
       emit(
         NotificationsLoaded(
           items: [...current.items, ...response.notifications],
-          hasMore: response.nextPageToken != null &&
+          hasMore:
+              response.nextPageToken != null &&
               response.nextPageToken!.isNotEmpty,
           nextPageToken: response.nextPageToken,
         ),
       );
     } catch (_) {
-      // Не уходим в общий error — просто откатываем флаг подгрузки.
       emit(current.copyWith(isLoadingMore: false));
     }
   }
 
-  /// Отметить уведомление прочитанным. После успеха обновляем список.
   Future<void> markAsRead(int id) async {
     try {
       await _dataSource.markNotificationAsRead(id);

@@ -1,6 +1,3 @@
-/// Уведомление чёрного каталога.
-/// Соответствует типу `Notification` из waypay-react
-/// (blacklist-plus/src/api/BlackCatalog/blackCatalog.ts).
 class BlackCatalogNotification {
   final int id;
   final String content;
@@ -20,9 +17,9 @@ class BlackCatalogNotification {
 
   factory BlackCatalogNotification.fromJson(Map<String, dynamic> json) {
     return BlackCatalogNotification(
-      id: (json['id'] as num?)?.toInt() ?? 0,
+      id: _asInt(json['id']),
       content: (json['content'] ?? '').toString(),
-      isRead: json['is_read'] == true,
+      isRead: _asBool(json['is_read'] ?? json['isRead']),
       userId: (json['user_id'] ?? json['userId'] ?? '').toString(),
       createdAt: (json['created_at'] ?? json['createdAt'] ?? '').toString(),
       entityId: (json['entity_id'] ?? json['entityId'])?.toString(),
@@ -41,7 +38,23 @@ class BlackCatalogNotification {
   }
 }
 
-/// Ответ на GET /black-catalog/notifications.
+int _asInt(dynamic value) {
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) return int.tryParse(value) ?? 0;
+  return 0;
+}
+
+bool _asBool(dynamic value) {
+  if (value is bool) return value;
+  if (value is num) return value != 0;
+  if (value is String) {
+    final normalized = value.trim().toLowerCase();
+    return normalized == 'true' || normalized == '1';
+  }
+  return false;
+}
+
 class NotificationsResponse {
   final List<BlackCatalogNotification> notifications;
   final String? nextPageToken;

@@ -5,14 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 part 'black_catalog_list_state.dart';
 
-/// Cubit главной страницы «Чёрный список» (BlackCatalogPage из waypay-react).
-///
-/// Поведение 1-в-1:
-///   • Поиск работает только при длине запроса >= 5 символов (debounce — на UI).
-///   • До поиска показывается empty state c текстом "Введите ФИО клиента…".
-///   • Если запрос отдал пустой список — отдельный empty state «Не найдено».
-///   • totalCount берётся из GET /black-catalog/count (когда понадобится для
-///     отображения, всегда хранится в state).
 class BlackCatalogListCubit extends Cubit<BlackCatalogListState> {
   BlackCatalogListCubit() : super(const BlackCatalogListInitial());
 
@@ -21,7 +13,6 @@ class BlackCatalogListCubit extends Cubit<BlackCatalogListState> {
 
   String _query = '';
 
-  /// Загрузить total count (для отображения в шапке/где угодно).
   Future<void> refreshTotalCount() async {
     try {
       final count = await _dataSource.getCount();
@@ -33,13 +24,9 @@ class BlackCatalogListCubit extends Cubit<BlackCatalogListState> {
       } else if (current is BlackCatalogListInitial) {
         emit(BlackCatalogListEmpty(totalCount: count, hasSearched: false));
       }
-    } catch (_) {
-      // не критично, count просто не отобразится
-    }
+    } catch (_) {}
   }
 
-  /// Выполнить поиск. Если query короче 5 символов или пуст — сбросить в
-  /// "не искали ещё" (empty state с подсказкой).
   Future<void> search(String query) async {
     _query = query;
     if (query.isEmpty || query.length < 5) {
@@ -47,8 +34,8 @@ class BlackCatalogListCubit extends Cubit<BlackCatalogListState> {
       final total = current is BlackCatalogListLoaded
           ? current.totalCount
           : current is BlackCatalogListEmpty
-              ? current.totalCount
-              : null;
+          ? current.totalCount
+          : null;
       emit(BlackCatalogListEmpty(totalCount: total, hasSearched: false));
       return;
     }
@@ -57,24 +44,27 @@ class BlackCatalogListCubit extends Cubit<BlackCatalogListState> {
     try {
       final response = await _dataSource.search(name: query);
       if (response.blackCatalogs.isEmpty) {
-        emit(BlackCatalogListEmpty(
-          totalCount: null,
-          hasSearched: true,
-          query: query,
-        ));
+        emit(
+          BlackCatalogListEmpty(
+            totalCount: null,
+            hasSearched: true,
+            query: query,
+          ),
+        );
       } else {
-        emit(BlackCatalogListLoaded(
-          items: response.blackCatalogs,
-          totalCount: response.count,
-          query: query,
-        ));
+        emit(
+          BlackCatalogListLoaded(
+            items: response.blackCatalogs,
+            totalCount: response.count,
+            query: query,
+          ),
+        );
       }
     } catch (e) {
       emit(BlackCatalogListError(_msg(e), query: query));
     }
   }
 
-  /// Перезагрузить с текущим запросом — после create/update/delete/addDebt.
   Future<void> refresh() async {
     if (_query.isEmpty || _query.length < 5) {
       await refreshTotalCount();
@@ -83,16 +73,12 @@ class BlackCatalogListCubit extends Cubit<BlackCatalogListState> {
     await search(_query);
   }
 
-  /// Удалить запись (используется из контекстного меню/листа).
   Future<void> deleteItem(int id) async {
     await _dataSource.deleteEntry(id);
     await refresh();
     await refreshTotalCount();
   }
 
-  /// Создать новую запись.
-  /// [isSwindler] = true для варианта «Чёрный список»,
-  /// = false для варианта «Оформленный».
   Future<int> createItem({
     required String fullname,
     required String doc,

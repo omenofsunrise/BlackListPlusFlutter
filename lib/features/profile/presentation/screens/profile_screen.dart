@@ -5,24 +5,7 @@ import 'package:blacklist_plus_flutter/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-/// Порт страницы ProfilePage.tsx из waypay-react.
-///
-/// Что переносим (1-в-1 с React):
-///   • Карточка профиля: круглый аватар с инициалами, ФИО, телефон.
-///   • Кнопка «Выйти из аккаунта», вызывающая authStorage.logout()
-///     (через AuthRemoteDataSource.logout) и переход на экран авторизации.
-///   • Блок «Мой чёрный список» (ProfileBlackCatalog).
-///
-/// Что НЕ переносим (по требованию):
-///   • Блок «Подписка действует до …»  ❌
-///   • Кнопку «Продлить подписку» / SubscriptionBlock  ❌
-///   • Любую логику оплаты/подписок  ❌
-///
-/// Цвета и отступы взяты из ProfilePage.tsx, чтобы визуально соответствовать
-/// React-странице.
 class ProfileScreen extends StatefulWidget {
-  /// Параметр оставлен для совместимости с существующим роутом app_router.dart,
-  /// но не используется (React-страница не имеет сущности «сотрудник»).
   final int? employeeId;
 
   const ProfileScreen({super.key, this.employeeId});
@@ -40,7 +23,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _phone = '';
   String? _error;
 
-  // Цвета из React ProfilePage:
   static const _bgGrey = Color(0xFFF6F8FA);
   static const _cardWhite = Colors.white;
   static const _accentTeal = Color(0xFF007D88);
@@ -56,13 +38,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadUserData();
   }
 
-  /// Аналог loadUserData() из App.tsx + ProfilePage props:
-  ///   const sessionInfo = await getSessionInfo();
-  ///   userData = {
-  ///     name:  sessionInfo.client.name  || 'Пользователь',
-  ///     phone: sessionInfo.client.phone || '',
-  ///     id:    sessionInfo.client.id    || '',
-  ///   };
   Future<void> _loadUserData() async {
     setState(() {
       _loading = true;
@@ -73,7 +48,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (!mounted) return;
 
       final clientRaw = session?['client'];
-      final client = clientRaw is Map ? Map<String, dynamic>.from(clientRaw) : null;
+      final client = clientRaw is Map
+          ? Map<String, dynamic>.from(clientRaw)
+          : null;
 
       setState(() {
         _name = (client?['name'] as String?)?.trim().isNotEmpty == true
@@ -93,17 +70,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  /// Аналог handleLogout из React ProfilePage:
-  ///   await authStorage.logout();
-  ///   navigate('/', { replace: true });
-  ///   window.location.reload();
   Future<void> _handleLogout() async {
     setState(() => _loggingOut = true);
     try {
       await _authDataSource.logout();
     } catch (_) {
-      // Логаут на бэке мог упасть — токены всё равно уже почищены в data source.
-      // Молча идём на экран авторизации.
     } finally {
       if (!mounted) return;
       setState(() => _loggingOut = false);
@@ -111,7 +82,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  /// Аналог `userData.name.charAt(0).toUpperCase()` из React ProfilePage.
   String get _avatarLetter {
     if (_name.isEmpty) return '?';
     return _name.substring(0, 1).toUpperCase();
@@ -149,10 +119,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onLogout: _loggingOut ? null : _handleLogout,
                     ),
                     const SizedBox(height: 24),
-                    const ProfileBlackCatalog(
-                      allowEdit: true,
-                      pageSize: 10,
-                    ),
+                    const ProfileBlackCatalog(allowEdit: true, pageSize: 10),
                     const SizedBox(height: 80),
                   ],
                 ),
@@ -209,7 +176,6 @@ class _ProfileCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // <h1>Профиль пользователя</h1>
           Text(
             'Профиль пользователя',
             style: TextStyle(
@@ -220,7 +186,6 @@ class _ProfileCard extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // Блок с аватаром, именем и телефоном.
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -274,12 +239,8 @@ class _ProfileCard extends StatelessWidget {
             ),
           ),
 
-          // ВНИМАНИЕ: блок «Подписка действует до …» и кнопка «Продлить
-          // подписку» НЕ переносим — по требованию задачи.
-
           const SizedBox(height: 24),
 
-          // Кнопка «Выйти из аккаунта».
           SizedBox(
             width: double.infinity,
             height: 48,
@@ -331,9 +292,7 @@ class _LogoutButtonState extends State<_LogoutButton> {
           backgroundColor: color,
           foregroundColor: Colors.white,
           elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         ),
         child: widget.isLoading
@@ -347,10 +306,7 @@ class _LogoutButtonState extends State<_LogoutButton> {
               )
             : const Text(
                 'Выйти из аккаунта',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
       ),
     );
@@ -370,10 +326,7 @@ class _ErrorBanner extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: const Color(0xFFFFCCC7)),
       ),
-      child: Text(
-        message,
-        style: const TextStyle(color: Color(0xFFCF1322)),
-      ),
+      child: Text(message, style: const TextStyle(color: Color(0xFFCF1322))),
     );
   }
 }

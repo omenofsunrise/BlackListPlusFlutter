@@ -1,7 +1,5 @@
 import 'package:blacklist_plus_flutter/features/black_catalog/data/models/black_catalog_item.dart';
 
-/// Ответ на GET /black-catalog/search — соответствует SearchBlackCatalogResponse
-/// из waypay-react.
 class SearchBlackCatalogResponse {
   final List<BlackCatalogItem> blackCatalogs;
   final int count;

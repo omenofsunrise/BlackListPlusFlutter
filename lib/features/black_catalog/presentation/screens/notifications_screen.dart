@@ -9,15 +9,6 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:waypay_flutter_library/waypay_styles.dart';
 
-/// Полный порт NotificationsPage.tsx из waypay-react.
-///
-/// Что воспроизведено 1-в-1:
-///   • Заголовок «Уведомления».
-///   • Empty state «Нет уведомлений…».
-///   • Карточки: текст, дата (с относительным форматированием), кнопка ✓
-///     для непрочитанных, тап по карточке отмечает прочитанным и открывает
-///     досье по entity_id.
-///   • Бесконечная подгрузка по next_page_token.
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
 
@@ -51,7 +42,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  /// Аналог formatDate из NotificationsPage.tsx — относительные подписи времени.
   String _formatDate(String raw) {
     if (raw.isEmpty) return '';
     final d = DateTime.tryParse(raw);
@@ -69,8 +59,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return DateFormat('d MMM, HH:mm', 'ru_RU').format(d);
   }
 
-  /// Аналог handleNotificationClick: отмечаем прочитанным и переходим
-  /// в досье, если есть entity_id.
   Future<void> _onNotificationTap(BlackCatalogNotification n) async {
     if (!n.isRead) {
       await _cubit.markAsRead(n.id);
@@ -79,7 +67,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final id = int.tryParse(n.entityId!);
     if (id == null) return;
 
-    // Тянем запись по id и открываем досье.
     try {
       final response = await getIt<BlackCatalogRemoteDataSource>().search(
         id: id,
@@ -87,9 +74,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       );
       if (!mounted) return;
       if (response.blackCatalogs.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Запись не найдена')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Запись не найдена')));
         return;
       }
       context.pushNamed(
@@ -98,9 +85,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Не удалось открыть запись: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Не удалось открыть запись: $e')));
     }
   }
 
@@ -242,9 +229,7 @@ class _NotificationCard extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             border: Border.all(
-              color: isRead
-                  ? const Color(0xFFE5E7EB)
-                  : const Color(0xFF007D88),
+              color: isRead ? const Color(0xFFE5E7EB) : const Color(0xFF007D88),
             ),
             borderRadius: BorderRadius.circular(10),
           ),
@@ -259,8 +244,7 @@ class _NotificationCard extends StatelessWidget {
                       notification.content,
                       style: TextStyle(
                         fontSize: 15,
-                        fontWeight:
-                            isRead ? FontWeight.w400 : FontWeight.w600,
+                        fontWeight: isRead ? FontWeight.w400 : FontWeight.w600,
                         color: const Color(0xFF111827),
                       ),
                     ),
@@ -289,10 +273,7 @@ class _NotificationCard extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 dateLabel,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF6B7280),
-                ),
+                style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
               ),
             ],
           ),

@@ -3,20 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:waypay_flutter_library/waypay_styles.dart';
 
-/// Какой тип записи создаётся (для выбранного пункта в меню «+»).
-///   • blacklist — запись в чёрном каталоге, без даты долга.
-///   • completed — оформленная запись, с обязательной датой долга.
 enum BlackCatalogAddOption { blacklist, completed }
 
-/// Результат сохранения формы (передаётся через Navigator.pop).
 class BlackCatalogFormResult {
   final String fullname;
   final String doc;
   final String address;
-  final String birthdate; // ISO yyyy-MM-dd (или '')
+  final String birthdate;
   final String comment;
   final bool isSwindler;
-  final String debtEndingAt; // ISO yyyy-MM-dd (или '')
+  final String debtEndingAt;
 
   const BlackCatalogFormResult({
     required this.fullname,
@@ -29,11 +25,6 @@ class BlackCatalogFormResult {
   });
 }
 
-/// Открывает модальное окно создания/редактирования записи. Возвращает
-/// заполненные данные или null, если пользователь закрыл.
-///
-/// [editing] — если задан, форма открывается в режиме редактирования.
-/// [option] — для нового объекта определяет, нужно ли поле даты долга.
 Future<BlackCatalogFormResult?> showBlackCatalogFormModal({
   required BuildContext context,
   BlackCatalogItem? editing,
@@ -105,7 +96,6 @@ class _BlackCatalogFormDialogState extends State<_BlackCatalogFormDialog> {
     super.dispose();
   }
 
-  /// Аналог normalizeIncomingDate из BlackCatalogModal.tsx.
   String _normalizeIncomingDate(String? value) {
     if (value == null || value.isEmpty) return '';
     if (value.contains('T')) {
@@ -123,7 +113,6 @@ class _BlackCatalogFormDialogState extends State<_BlackCatalogFormDialog> {
     return value;
   }
 
-  /// Аналог formatDateForAPI: на сервер уходит yyyy-MM-dd (ISO).
   String _formatDateForApi(String input) {
     if (input.isEmpty) return '';
     if (input.contains('T')) return input.split('T').first;
@@ -135,8 +124,6 @@ class _BlackCatalogFormDialogState extends State<_BlackCatalogFormDialog> {
     return input;
   }
 
-  /// Авто-форматирование ФИО, в точности как formatFullNameLive из React:
-  /// каждое слово (и каждый сегмент через дефис) с большой буквы, остальное в нижнем регистре.
   String _formatFullName(String input) {
     if (input.isEmpty) return '';
     final parts = <String>[];
@@ -189,7 +176,6 @@ class _BlackCatalogFormDialogState extends State<_BlackCatalogFormDialog> {
     }
   }
 
-  /// Маска ДД.ММ.ГГГГ для дат рождения и срока долга.
   void _onDateChanged(TextEditingController controller, String value) {
     final digits = value.replaceAll(RegExp(r'\D'), '');
     final clipped = digits.length > 8 ? digits.substring(0, 8) : digits;
@@ -253,82 +239,96 @@ class _BlackCatalogFormDialogState extends State<_BlackCatalogFormDialog> {
     final title = isEditing ? 'Редактировать запись' : 'Добавить запись';
     final saveButton = isEditing ? 'Сохранить' : 'Добавить';
 
-    return AlertDialog(
-      title: Text(title),
-      contentPadding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-      content: SizedBox(
-        width: 500,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _input(
-                controller: _fullnameController,
-                hint: 'ФИО',
-                onChanged: _onFullnameChanged,
-              ),
-              const SizedBox(height: 12),
-              _input(
-                controller: _birthdateController,
-                hint: 'Дата рождения (ДД.ММ.ГГГГ)',
-                onChanged: (v) => _onDateChanged(_birthdateController, v),
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                  LengthLimitingTextInputFormatter(10),
-                ],
-              ),
-              const SizedBox(height: 12),
-              _input(
-                controller: _docController,
-                hint: 'Документ (серия и номер)',
-              ),
-              const SizedBox(height: 12),
-              _input(controller: _addressController, hint: 'Адрес'),
-              if (!isEditing) ...[
-                if (widget.showDebtSection) ...[
+    return Dialog(
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 520),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF111827),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _input(
+                  controller: _fullnameController,
+                  hint: 'ФИО',
+                  onChanged: _onFullnameChanged,
+                ),
+                const SizedBox(height: 12),
+                _input(
+                  controller: _birthdateController,
+                  hint: 'Дата рождения (ДД.ММ.ГГГГ)',
+                  onChanged: (v) => _onDateChanged(_birthdateController, v),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                    LengthLimitingTextInputFormatter(10),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                _input(
+                  controller: _docController,
+                  hint: 'Документ (серия и номер)',
+                ),
+                const SizedBox(height: 12),
+                _input(controller: _addressController, hint: 'Адрес'),
+                if (!isEditing) ...[
+                  if (widget.showDebtSection) ...[
+                    const SizedBox(height: 12),
+                    _input(
+                      controller: _debtEndingController,
+                      hint: 'Оформлен до (ДД.ММ.ГГГГ)',
+                      onChanged: (v) =>
+                          _onDateChanged(_debtEndingController, v),
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                        LengthLimitingTextInputFormatter(10),
+                      ],
+                      errorText: _debtError,
+                    ),
+                  ],
                   const SizedBox(height: 12),
-                  _input(
-                    controller: _debtEndingController,
-                    hint: 'Оформлен до (ДД.ММ.ГГГГ)',
-                    onChanged: (v) =>
-                        _onDateChanged(_debtEndingController, v),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
-                      LengthLimitingTextInputFormatter(10),
-                    ],
-                    errorText: _debtError,
+                  ModalTextField(
+                    controller: _commentController,
+                    label: 'Комментарий',
+                    maxLines: 4,
+                    minLines: 3,
                   ),
                 ],
-                const SizedBox(height: 12),
-                ModalTextField(
-                  controller: _commentController,
-                  label: 'Комментарий',
-                  maxLines: 4,
-                  minLines: 3,
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: DefaultButton(
+                    text: saveButton,
+                    isPrimary: true,
+                    onPressed: _submitting ? null : _submit,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: _submitting
+                      ? null
+                      : () => Navigator.of(context).pop(),
+                  child: const Text('Отмена'),
                 ),
               ],
-              const SizedBox(height: 16),
-            ],
+            ),
           ),
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: _submitting ? null : () => Navigator.of(context).pop(),
-          child: const Text('Отмена'),
-        ),
-        SizedBox(
-          width: 140,
-          child: DefaultButton(
-            text: saveButton,
-            isPrimary: true,
-            onPressed: _submitting ? null : _submit,
-          ),
-        ),
-      ],
     );
   }
 

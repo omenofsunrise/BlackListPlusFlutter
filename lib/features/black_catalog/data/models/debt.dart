@@ -1,5 +1,3 @@
-/// Модель задолженности (соответствует Debt из
-/// blacklist-plus/src/api/BlackCatalog/blackCatalog.ts).
 class Debt {
   final int id;
   final String debtEndingAt;

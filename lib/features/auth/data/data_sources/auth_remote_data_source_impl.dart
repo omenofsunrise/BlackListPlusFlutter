@@ -9,18 +9,6 @@ import 'package:blacklist_plus_flutter/features/auth/data/models/session_model.d
 import 'package:blacklist_plus_flutter/features/auth/data/models/start_auth_request_model.dart';
 import 'package:blacklist_plus_flutter/features/auth/data/models/start_auth_response_model.dart';
 
-/// Реализация авторизации, повторяющая логику waypay_react_library
-/// (файлы lib/api/authCall, lib/api/client, lib/utils/authStorage).
-///
-/// Эндпоинты и тела запросов — байт-в-байт как в React-исходнике:
-///   POST /auth/call/initiate   { phone, user_type }
-///   POST /auth/call/confirm    { phone, check_id, user_type, name }
-///   GET  /auth/session/info
-///   POST /auth/session/revoke  { token_id? }
-///
-/// Refresh-механизм оставлен в том виде, в котором он работает на бэкенде
-/// для мобильного клиента (через body), потому что в React refresh идёт через
-/// HttpOnly-cookie — на мобильном это недоступно.
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final Dio dio;
 
@@ -41,8 +29,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       return StartAuthResponseModel.fromJson(data);
     } on DioException catch (e) {
       print('❌ Ошибка startAuth: ${e.response?.data}');
-      // В React-библиотеке initiateCallAuth кидает Error → AuthPage ловит и
-      // показывает "Не удалось инициировать авторизацию. Проверьте номер."
       throw Exception(
         _extractErrorMessage(
           e,
@@ -66,8 +52,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final data = _asMap(response.data);
       final status = (data['status'] ?? '').toString().toUpperCase();
 
-      // Поведение AuthPage в React: успехом считается наличие ОБОИХ токенов.
-      // Любой другой ответ (включая status=AUTH_PENDING) — ещё не подтверждено.
       final accessToken = data['access_token'] ?? data['accessToken'];
       final refreshToken = data['refresh_token'] ?? data['refreshToken'];
       if (accessToken is String &&
@@ -92,10 +76,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
       return false;
     } on DioException catch (e) {
-      // В React confirmCallAuth ошибка ловится в catch и просто логируется
-      // ("Verification error:") — поллинг продолжается. Чтобы повторить это
-      // поведение, бросаем исключение, а cubit сам решит, гасить ли его при
-      // авто-проверке (он гасит).
       print('❌ Ошибка confirmCall: ${e.response?.data}');
       throw Exception(_extractErrorMessage(e, 'Ошибка подтверждения звонка'));
     }
@@ -144,8 +124,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-  /// Полный аналог `authStorage.getSessionInfo()` из waypay_react_library:
-  /// при любой ошибке возвращает null, никогда не бросает.
   @override
   Future<Map<String, dynamic>?> getSessionInfo() async {
     try {
@@ -205,14 +183,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
-  /// Полный аналог `authStorage.logout(tokenId?)` из waypay_react_library.
-  ///
-  /// React-код:
-  ///   await oe("/auth/session/revoke", {
-  ///     method: "POST",
-  ///     headers: { "Content-Type": "application/json" },
-  ///     body: e ? { token_id: e } : {},
-  ///   });
   @override
   Future<void> logout({String? tokenId}) async {
     final tokenStorage = TokenStorage();
@@ -235,15 +205,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       print('✅ logout: сессия отозвана на бэкенде');
     } on DioException catch (e) {
-      // React тоже логирует ошибку, но всё равно бросает наверх.
       print('❌ Ошибка logout: ${e.response?.data}');
-      // На всякий случай чистим локальные токены, чтобы пользователь не остался
-      // с "висящей" сессией на клиенте.
       await tokenStorage.clearAll();
       throw Exception(_extractErrorMessage(e, 'Не удалось выйти из аккаунта'));
     }
 
-    // Успех: убираем токены и флаг авторизации.
     await tokenStorage.clearAll();
   }
 
