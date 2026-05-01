@@ -1,6 +1,5 @@
 import 'package:blacklist_plus_flutter/features/auth/presentation/bloc/auth_cubit.dart';
 import 'package:blacklist_plus_flutter/features/auth/presentation/widgets/call_confirmation_dialog.dart';
-import 'package:blacklist_plus_flutter/features/auth/presentation/widgets/name_required_dialog.dart';
 import 'package:blacklist_plus_flutter/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,7 +24,6 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
     filter: {"#": RegExp(r'\d')},
   );
   bool _isDialogShowing = false;
-  bool _isNameDialogShowing = false;
 
   @override
   void initState() {
@@ -48,25 +46,10 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => AuthCubit(),
+      create: (_) => AuthCubit(enableRegistration: false),
       child: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           debugPrint('🎯 Состояние AuthCubit изменилось: $state');
-
-          if (state is AuthNameRequired) {
-            debugPrint('🆕 name_required → показываем модалку имени');
-            if (!_isNameDialogShowing) {
-              _isNameDialogShowing = true;
-              final cubit = context.read<AuthCubit>();
-              WidgetsBinding.instance.addPostFrameCallback((_) async {
-                final name = await showNameRequiredDialog(context);
-                _isNameDialogShowing = false;
-                if (name != null && name.trim().isNotEmpty) {
-                  await cubit.submitName(name);
-                }
-              });
-            }
-          }
 
           if (state is AuthCodeSent) {
             debugPrint('📞 Показываем диалог подтверждения');
@@ -157,7 +140,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                           const SizedBox(height: 16),
                         ],
                         Text(
-                          'Регистрация / Авторизация',
+                          'Авторизация',
                           style: AppStyle.manrope(
                             size: 24,
                             weight: FontWeight.w600,

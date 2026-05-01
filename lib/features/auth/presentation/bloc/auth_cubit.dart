@@ -40,7 +40,11 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       final startResponse = await _authDataSource.startAuth(
-        StartAuthRequestModel(phone: normalized, userType: userType),
+        StartAuthRequestModel(
+          phone: normalized,
+          userType: userType,
+          moderate: true,
+        ),
       );
 
       _checkId = startResponse.checkId;

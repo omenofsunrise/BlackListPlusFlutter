@@ -26,7 +26,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       );
       print('✅ Успешный ответ startAuth: ${response.data}');
       final data = _asMap(response.data);
-      return StartAuthResponseModel.fromJson(data);
+      final model = StartAuthResponseModel.fromJson(data);
+      if (!model.success) {
+        throw Exception(model.message ?? 'Ошибка авторизации');
+      }
+      return model;
     } on DioException catch (e) {
       print('❌ Ошибка startAuth: ${e.response?.data}');
       throw Exception(
@@ -90,6 +94,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final body = {
         'access_token': request.accessToken,
         'refresh_token': request.refreshToken,
+        'moderate': true,
       };
       print('🔄 Запрос на обновление токена: $body');
 
