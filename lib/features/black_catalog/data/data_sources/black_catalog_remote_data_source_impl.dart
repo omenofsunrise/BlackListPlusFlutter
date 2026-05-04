@@ -90,7 +90,11 @@ class BlackCatalogRemoteDataSourceImpl implements BlackCatalogRemoteDataSource {
     }
 
     try {
-      final response = await dio.post(_basePath, data: body);
+      final response = await dio.post(
+        _basePath,
+        data: FormData.fromMap(body),
+        options: Options(contentType: 'multipart/form-data'),
+      );
       final data = response.data;
       if (data is Map) {
         final id = data['id'];

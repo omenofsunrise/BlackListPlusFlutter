@@ -250,11 +250,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     final months = int.tryParse(_monthsController.text) ?? 0;
     final initial =
         double.tryParse(_initialController.text.replaceAll(' ', '')) ?? 0;
-    final percent = double.tryParse(_percentController.text) ?? 0;
-
     final displayAmount = money(amount);
     final displayInitial = money(initial);
-    final displayPercent = NumberFormat('0', 'ru').format(percent);
     final displayMonths = months.toString();
     final displayStart = DateFormat('dd.MM.yyyy', 'ru').format(_startDate);
 
@@ -379,28 +376,6 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                                   ),
                                   pw.TextSpan(
                                     text: '$displayAmount ₽',
-                                    style: pw.TextStyle(
-                                      font: fontBold,
-                                      color: textDark,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          pw.Padding(
-                            padding: const pw.EdgeInsets.symmetric(vertical: 2),
-                            child: pw.RichText(
-                              text: pw.TextSpan(
-                                children: [
-                                  pw.TextSpan(
-                                    text: 'Надбавка: ',
-                                    style: pw.TextStyle(
-                                      color: PdfColor.fromInt(0xFF374151),
-                                    ),
-                                  ),
-                                  pw.TextSpan(
-                                    text: '$displayPercent%',
                                     style: pw.TextStyle(
                                       font: fontBold,
                                       color: textDark,
@@ -900,22 +875,18 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       controller: controller,
       label: 'Начало выплат',
       onTap: () async {
-        final picked = await showDialog<DateTime>(
+        await showDialog<void>(
           context: context,
           builder: (_) => CustomCalendar(
             initialDate: _startDate,
             prefix: 'Начало выплат:',
             onDateSelected: (date) {
-              Navigator.of(context).pop(date);
+              setState(() => _startDate = date);
+              controller.text = DateFormat('dd.MM.yyyy').format(_startDate);
+              _calculate();
             },
           ),
         );
-
-        if (picked != null) {
-          setState(() => _startDate = picked);
-          controller.text = DateFormat('dd.MM.yyyy').format(_startDate);
-          _calculate();
-        }
       },
       customSuffixIcon: Transform.translate(
         offset: const Offset(-8, 0),

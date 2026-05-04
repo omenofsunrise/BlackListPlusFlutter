@@ -60,6 +60,7 @@ class _MyAppState extends State<MyApp> {
     if (isOffline == null) {
       return const MaterialApp(
         debugShowCheckedModeBanner: false,
+        builder: _appTextScaleBuilder,
         home: Scaffold(body: Center(child: CircularProgressIndicator())),
       );
     }
@@ -67,11 +68,13 @@ class _MyAppState extends State<MyApp> {
     final app = isOffline!
         ? const MaterialApp(
             debugShowCheckedModeBanner: false,
+            builder: _appTextScaleBuilder,
             home: NetworkErrorScreen(),
           )
         : MaterialApp.router(
             debugShowCheckedModeBanner: false,
             title: 'waypay_mobile',
+            builder: _appTextScaleBuilder,
             routerConfig: AppRouter.router,
             theme: ThemeData(
               colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -132,4 +135,12 @@ class _MyAppState extends State<MyApp> {
       child: app,
     );
   }
+}
+
+Widget _appTextScaleBuilder(BuildContext context, Widget? child) {
+  final mediaQuery = MediaQuery.of(context);
+  return MediaQuery(
+    data: mediaQuery.copyWith(textScaler: const TextScaler.linear(0.94)),
+    child: child ?? const SizedBox.shrink(),
+  );
 }
