@@ -1,4 +1,7 @@
 import 'package:blacklist_plus_flutter/core/network/token_storage.dart';
+import 'package:blacklist_plus_flutter/core/di/dependency_injection.dart';
+import 'package:blacklist_plus_flutter/core/utils/moderation_utils.dart';
+import 'package:blacklist_plus_flutter/features/auth/data/data_sources/auth_remote_data_source.dart';
 import 'package:blacklist_plus_flutter/features/auth/presentation/screens/phone_auth_screen.dart';
 import 'package:blacklist_plus_flutter/features/black_catalog/data/models/black_catalog_item.dart';
 import 'package:blacklist_plus_flutter/features/black_catalog/presentation/screens/black_catalog_dossier_screen.dart';
@@ -58,8 +61,21 @@ class AppRouter {
         }
         return null;
       }
-      if (here == '/' || here == Routes.phoneAuthScreen.toPath) {
-        return Routes.calculatorScreen.toPath;
+      final isCalculatorRoute = here == Routes.calculatorScreen.toPath;
+      if (here == '/' || here == Routes.phoneAuthScreen.toPath || isCalculatorRoute) {
+        try {
+          final authDataSource = getIt<AuthRemoteDataSource>();
+          final authInfo = await authDataSource.getAuthInfo();
+          final moderated = isUserModerated(authInfo);
+          if (!moderated && isCalculatorRoute) {
+            return Routes.blacklistScreen.toPath;
+          }
+          return moderated
+              ? Routes.calculatorScreen.toPath
+              : Routes.blacklistScreen.toPath;
+        } catch (_) {
+          return Routes.blacklistScreen.toPath;
+        }
       }
 
       return null;

@@ -20,6 +20,7 @@ class CalculatorScreen extends StatefulWidget {
 
 class _CalculatorScreenState extends State<CalculatorScreen> {
   final GlobalKey _headerTitleKey = GlobalKey();
+  final GlobalKey _shareButtonKey = GlobalKey();
   final _sumController = TextEditingController();
   final _monthsController = TextEditingController();
   final _initialController = TextEditingController();
@@ -203,6 +204,20 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     super.dispose();
   }
 
+  Rect? _sharePositionOrigin() {
+    final RenderBox? box =
+        _shareButtonKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null || !box.attached) {
+      final Size screen = MediaQuery.of(context).size;
+      return Rect.fromCenter(
+        center: Offset(screen.width / 2, screen.height / 2),
+        width: 1,
+        height: 1,
+      );
+    }
+    return box.localToGlobal(Offset.zero) & box.size;
+  }
+
   Future<void> _generateAndSharePdf() async {
     try {
       final bytes = await _buildPdfBytes();
@@ -213,7 +228,11 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
       final file = File('${dir.path}/$filename');
       await file.writeAsBytes(bytes, flush: true);
 
-      await Share.shareXFiles([XFile(file.path)], subject: 'Расчёт рассрочки');
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        subject: 'Расчёт рассрочки',
+        sharePositionOrigin: _sharePositionOrigin(),
+      );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(
@@ -659,6 +678,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                     onPressed: () => _showCalculationModeMenu(context),
                   ),
                   IconButton(
+                    key: _shareButtonKey,
                     icon: SvgPicture.asset(
                       SvgIcons.share,
                       width: 24,

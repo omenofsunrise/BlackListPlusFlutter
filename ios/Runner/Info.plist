@@ -24,14 +24,18 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>Камера нужна для добавления фото в профиле и карточках каталога.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Доступ к фото нужен для выбора изображений из галереи.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Доступ нужен для сохранения и экспорта файлов/изображений.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Доступ к фото нужен для выбора изображений из галереи.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -71,10 +75,6 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>tel</string>
 	</array>
 </dict>
 </plist>

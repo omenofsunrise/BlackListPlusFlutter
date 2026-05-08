@@ -86,3 +86,6 @@ flutter_launcher_icons:
   adaptive_icon_background: "#ffffff"
   adaptive_icon_foreground: "assets/icons/logo_adaptive.PNG"
   remove_alpha_ios: true
+
+dependency_overrides:
+  objective_c: 9.1.0

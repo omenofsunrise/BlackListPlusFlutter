@@ -110,7 +110,6 @@ class TokenStorage {
     final body = <String, dynamic>{
       'access_token': access,
       'refresh_token': refresh,
-      'moderate': true,
     };
 
     try {

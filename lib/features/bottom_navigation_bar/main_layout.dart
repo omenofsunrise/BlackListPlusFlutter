@@ -1,37 +1,81 @@
 import 'package:blacklist_plus_flutter/assets/resources.dart';
+import 'package:blacklist_plus_flutter/core/di/dependency_injection.dart';
 import 'package:blacklist_plus_flutter/core/utils/bottom_nav_controller.dart';
+import 'package:blacklist_plus_flutter/core/utils/moderation_utils.dart';
+import 'package:blacklist_plus_flutter/features/auth/data/data_sources/auth_remote_data_source.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:waypay_flutter_library/waypay_styles.dart';
 
-class MainLayout extends StatelessWidget {
+class MainLayout extends StatefulWidget {
   const MainLayout({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
+  @override
+  State<MainLayout> createState() => _MainLayoutState();
+}
+
+class _MainLayoutState extends State<MainLayout> {
+  late final Future<bool> _isModeratedFuture;
+
   static const _navConfigs = [
-    _NavItemConfig(icon: SvgIcons.calculator),
-    _NavItemConfig(icon: SvgIcons.notebook),
-    _NavItemConfig(icon: SvgIcons.bell),
-    _NavItemConfig(icon: SvgIcons.users),
+    _NavItemConfig(icon: SvgIcons.calculator, branchIndex: 0),
+    _NavItemConfig(icon: SvgIcons.notebook, branchIndex: 1),
+    _NavItemConfig(icon: SvgIcons.bell, branchIndex: 2),
+    _NavItemConfig(icon: SvgIcons.users, branchIndex: 3),
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _isModeratedFuture = _loadModerationStatus();
+  }
+
+  Future<bool> _loadModerationStatus() async {
+    try {
+      final authDataSource = getIt<AuthRemoteDataSource>();
+      final authInfo = await authDataSource.getAuthInfo();
+      return isUserModerated(authInfo);
+    } catch (_) {
+      return true;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final navigationShell = widget.navigationShell;
+
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: ValueListenableBuilder<bool>(
         valueListenable: BottomNavController.instance,
         builder: (context, visible, _) {
           if (!visible) return const SizedBox.shrink();
-          return _AppBottomNavBar(
-            currentIndex: navigationShell.currentIndex,
-            items: _navConfigs,
-            onTap: (index) {
-              navigationShell.goBranch(
-                index,
-                initialLocation: index == navigationShell.currentIndex,
+          return FutureBuilder<bool>(
+            future: _isModeratedFuture,
+            builder: (context, snapshot) {
+              final isModerated = snapshot.data ?? true;
+              final items = isModerated
+                  ? _navConfigs
+                  : _navConfigs
+                        .where((item) => item.branchIndex != 0)
+                        .toList();
+              final currentUiIndex = items.indexWhere(
+                (item) => item.branchIndex == navigationShell.currentIndex,
+              );
+
+              return _AppBottomNavBar(
+                currentIndex: currentUiIndex < 0 ? 0 : currentUiIndex,
+                items: items,
+                onTap: (index) {
+                  final branchIndex = items[index].branchIndex;
+                  navigationShell.goBranch(
+                    branchIndex,
+                    initialLocation: branchIndex == navigationShell.currentIndex,
+                  );
+                },
               );
             },
           );
@@ -131,7 +175,8 @@ class _NavItem extends StatelessWidget {
 }
 
 class _NavItemConfig {
-  const _NavItemConfig({required this.icon});
+  const _NavItemConfig({required this.icon, required this.branchIndex});
 
   final String icon;
+  final int branchIndex;
 }

@@ -1,4 +1,7 @@
 import 'package:blacklist_plus_flutter/features/auth/presentation/bloc/auth_cubit.dart';
+import 'package:blacklist_plus_flutter/core/di/dependency_injection.dart';
+import 'package:blacklist_plus_flutter/core/utils/moderation_utils.dart';
+import 'package:blacklist_plus_flutter/features/auth/data/data_sources/auth_remote_data_source.dart';
 import 'package:blacklist_plus_flutter/features/auth/presentation/widgets/call_confirmation_dialog.dart';
 import 'package:blacklist_plus_flutter/routes/routes.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +27,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
     filter: {"#": RegExp(r'\d')},
   );
   bool _isDialogShowing = false;
+  bool _isNavigating = false;
 
   @override
   void initState() {
@@ -86,9 +90,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
               _isDialogShowing = false;
             }
 
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              context.go(Routes.calculatorScreen.toPath);
-            });
+            _navigateAfterAuth();
           }
 
           if (state is AuthError) {
@@ -197,5 +199,26 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
         },
       ),
     );
+  }
+
+  Future<void> _navigateAfterAuth() async {
+    if (_isNavigating || !mounted) return;
+    _isNavigating = true;
+    try {
+      final authDataSource = getIt<AuthRemoteDataSource>();
+      final authInfo = await authDataSource.getAuthInfo();
+      final moderated = isUserModerated(authInfo);
+      if (!mounted) return;
+      context.go(
+        moderated
+            ? Routes.calculatorScreen.toPath
+            : Routes.blacklistScreen.toPath,
+      );
+    } catch (_) {
+      if (!mounted) return;
+      context.go(Routes.blacklistScreen.toPath);
+    } finally {
+      _isNavigating = false;
+    }
   }
 }

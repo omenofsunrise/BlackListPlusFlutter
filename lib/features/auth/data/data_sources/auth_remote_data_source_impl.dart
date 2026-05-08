@@ -94,7 +94,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final body = {
         'access_token': request.accessToken,
         'refresh_token': request.refreshToken,
-        'moderate': true,
       };
       print('🔄 Запрос на обновление токена: $body');
 

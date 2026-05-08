@@ -1,0 +1,65 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "BlackListPlusFlutter",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "BlackListPlusFlutter (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "BlackListPlusFlutter (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "icons",
+            "cwd": "assets/icons",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "icons (profile mode)",
+            "cwd": "assets/icons",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "icons (release mode)",
+            "cwd": "assets/icons",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "waypay_flutter_library",
+            "cwd": "packages/waypay_flutter_library",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "waypay_flutter_library (profile mode)",
+            "cwd": "packages/waypay_flutter_library",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "waypay_flutter_library (release mode)",
+            "cwd": "packages/waypay_flutter_library",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

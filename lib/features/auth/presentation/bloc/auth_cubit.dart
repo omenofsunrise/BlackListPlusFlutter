@@ -43,7 +43,6 @@ class AuthCubit extends Cubit<AuthState> {
         StartAuthRequestModel(
           phone: normalized,
           userType: userType,
-          moderate: true,
         ),
       );
 
