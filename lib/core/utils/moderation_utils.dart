@@ -10,7 +10,10 @@ bool isUserModerated(Map<String, dynamic>? authInfo) {
   bool? readModerationFlag(Map<String, dynamic>? source) {
     if (source == null) return null;
     final value =
-        source['moderate'] ?? source['isModerated'] ?? source['moderated'];
+        source['is_moderated'] ??
+        source['isModerated'] ??
+        source['moderated'] ??
+        source['moderate'];
     return value is bool ? value : null;
   }
 
