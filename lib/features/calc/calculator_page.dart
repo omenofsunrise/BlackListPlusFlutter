@@ -285,6 +285,33 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     final sumForBar = (debt + overpayment);
     final debtPct = sumForBar > 0 ? (debt / sumForBar) : 0.5;
 
+    final List<List<String>> scheduleRows = [];
+    if (months > 0 && debt > 0 && monthlyPayment > 0) {
+      double remaining = debt;
+      for (int i = 0; i < months; i++) {
+        final paymentDate = DateTime(
+          _startDate.year,
+          _startDate.month + i,
+          _startDate.day,
+        );
+        final isLast = i == months - 1;
+        double pay;
+        if (isLast) {
+          pay = remaining > 0 ? remaining : 0;
+        } else {
+          pay = monthlyPayment <= remaining ? monthlyPayment : remaining;
+        }
+        remaining -= pay;
+        if (remaining < 0) remaining = 0;
+        scheduleRows.add([
+          '${i + 1}',
+          DateFormat('dd.MM.yyyy', 'ru').format(paymentDate),
+          '${money(pay)} ₽',
+          '${money(remaining)} ₽',
+        ]);
+      }
+    }
+
     pw.Widget card(pw.Widget child) => pw.Container(
       decoration: pw.BoxDecoration(
         color: white,
@@ -535,6 +562,67 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
               ],
             ),
           ),
+
+          if (scheduleRows.isNotEmpty) ...[
+            pw.Container(
+              margin: const pw.EdgeInsets.only(bottom: 12),
+              padding: const pw.EdgeInsets.symmetric(horizontal: 4),
+              child: pw.Row(
+                crossAxisAlignment: pw.CrossAxisAlignment.center,
+                children: [
+                  pw.Container(
+                    width: 4,
+                    height: 20,
+                    color: accent,
+                    margin: const pw.EdgeInsets.only(right: 10),
+                  ),
+                  pw.Text(
+                    'График платежей',
+                    style: pw.TextStyle(
+                      fontSize: 18,
+                      color: primary,
+                      font: fontBold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            pw.TableHelper.fromTextArray(
+              border: pw.TableBorder.all(color: rowBorder, width: 0.5),
+              headerStyle: pw.TextStyle(
+                font: fontBold,
+                color: white,
+                fontSize: 11,
+              ),
+              headerDecoration: const pw.BoxDecoration(color: primary),
+              cellStyle: pw.TextStyle(fontSize: 11, color: textDark),
+              cellAlignments: {
+                0: pw.Alignment.center,
+                1: pw.Alignment.centerLeft,
+                2: pw.Alignment.centerRight,
+                3: pw.Alignment.centerRight,
+              },
+              headerAlignments: {
+                0: pw.Alignment.center,
+                1: pw.Alignment.centerLeft,
+                2: pw.Alignment.centerRight,
+                3: pw.Alignment.centerRight,
+              },
+              columnWidths: {
+                0: const pw.FixedColumnWidth(40),
+                1: const pw.FlexColumnWidth(2),
+                2: const pw.FlexColumnWidth(1.5),
+                3: const pw.FlexColumnWidth(1.5),
+              },
+              cellPadding: const pw.EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 6,
+              ),
+              headers: ['№', 'Дата платежа', 'Платёж', 'Остаток'],
+              data: scheduleRows,
+            ),
+            pw.SizedBox(height: 30),
+          ],
 
           card(
             pw.Center(

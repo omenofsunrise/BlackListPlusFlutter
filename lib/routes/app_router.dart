@@ -65,12 +65,17 @@ class AppRouter {
       if (here == '/' || here == Routes.phoneAuthScreen.toPath || isCalculatorRoute) {
         try {
           final authDataSource = getIt<AuthRemoteDataSource>();
-          final authInfo = await authDataSource.getAuthInfo();
-          final moderated = isUserModerated(authInfo);
-          if (!moderated && isCalculatorRoute) {
+          final results = await Future.wait([
+            authDataSource.getAuthInfo(),
+            authDataSource.hasActiveSubscription(),
+          ]);
+          final authInfo = results[0] as Map<String, dynamic>;
+          final hasActive = results[1] as bool;
+          final canUseCalculator = isUserModerated(authInfo) && hasActive;
+          if (!canUseCalculator && isCalculatorRoute) {
             return Routes.blacklistScreen.toPath;
           }
-          return moderated
+          return canUseCalculator
               ? Routes.calculatorScreen.toPath
               : Routes.blacklistScreen.toPath;
         } catch (_) {

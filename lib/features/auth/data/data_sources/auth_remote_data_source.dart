@@ -19,6 +19,8 @@ abstract class AuthRemoteDataSource {
 
   Future<Map<String, dynamic>> getAuthInfo();
 
+  Future<bool> hasActiveSubscription();
+
   Future<List<SessionModel>> getSessions();
   Future<void> revokeSession(int sessionId);
 

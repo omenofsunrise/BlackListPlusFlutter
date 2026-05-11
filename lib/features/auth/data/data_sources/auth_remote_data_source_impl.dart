@@ -188,6 +188,23 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
+  Future<bool> hasActiveSubscription() async {
+    try {
+      print('📥 Проверка подписки BlackList Plus...');
+      final response = await dio.get('/user/profile/has-name');
+      print('✅ Ответ подписки: ${response.data}');
+      final data = response.data;
+      if (data is Map) {
+        return data['status']?.toString().toLowerCase() == 'active';
+      }
+      return false;
+    } on DioException catch (e) {
+      print('❌ Ошибка hasActiveSubscription: ${e.response?.data}');
+      return true;
+    }
+  }
+
+  @override
   Future<void> logout({String? tokenId}) async {
     final tokenStorage = TokenStorage();
     final access = await tokenStorage.getAccessToken();

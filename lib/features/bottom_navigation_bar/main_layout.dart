@@ -18,7 +18,7 @@ class MainLayout extends StatefulWidget {
 }
 
 class _MainLayoutState extends State<MainLayout> {
-  late final Future<bool> _isModeratedFuture;
+  late final Future<bool> _showCalculatorFuture;
 
   static const _navConfigs = [
     _NavItemConfig(icon: SvgIcons.calculator, branchIndex: 0),
@@ -30,14 +30,19 @@ class _MainLayoutState extends State<MainLayout> {
   @override
   void initState() {
     super.initState();
-    _isModeratedFuture = _loadModerationStatus();
+    _showCalculatorFuture = _loadCalculatorVisibility();
   }
 
-  Future<bool> _loadModerationStatus() async {
+  Future<bool> _loadCalculatorVisibility() async {
     try {
       final authDataSource = getIt<AuthRemoteDataSource>();
-      final authInfo = await authDataSource.getAuthInfo();
-      return isUserModerated(authInfo);
+      final results = await Future.wait([
+        authDataSource.getAuthInfo(),
+        authDataSource.hasActiveSubscription(),
+      ]);
+      final authInfo = results[0] as Map<String, dynamic>;
+      final hasActive = results[1] as bool;
+      return isUserModerated(authInfo) && hasActive;
     } catch (_) {
       return true;
     }
@@ -54,10 +59,10 @@ class _MainLayoutState extends State<MainLayout> {
         builder: (context, visible, _) {
           if (!visible) return const SizedBox.shrink();
           return FutureBuilder<bool>(
-            future: _isModeratedFuture,
+            future: _showCalculatorFuture,
             builder: (context, snapshot) {
-              final isModerated = snapshot.data ?? true;
-              final items = isModerated
+              final showCalculator = snapshot.data ?? true;
+              final items = showCalculator
                   ? _navConfigs
                   : _navConfigs
                         .where((item) => item.branchIndex != 0)
