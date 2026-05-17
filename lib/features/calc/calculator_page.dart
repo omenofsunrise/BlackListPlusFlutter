@@ -1,5 +1,10 @@
 import 'dart:io';
 import 'package:blacklist_plus_flutter/assets/resources.dart';
+import 'package:blacklist_plus_flutter/core/di/dependency_injection.dart';
+import 'package:blacklist_plus_flutter/features/calc/data/calc_preset.dart';
+import 'package:blacklist_plus_flutter/features/calc/data/calc_preset_service.dart';
+import 'package:blacklist_plus_flutter/features/calc/data/calculation_mode.dart';
+import 'package:blacklist_plus_flutter/features/calc/widgets/calc_preset_modal.dart';
 import 'package:blacklist_plus_flutter/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,6 +35,8 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   final _roundController = TextEditingController();
   final FocusNode _monthsFocusNode = FocusNode();
 
+  final CalcPresetService _presetService = getIt<CalcPresetService>();
+
   DateTime _startDate = DateTime.now().add(const Duration(days: 31));
 
   double monthlyPayment = 0;
@@ -50,6 +57,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     _monthsController.addListener(_handleMonthsChanged);
     _sumController.addListener(_calculate);
     _initialController.addListener(_calculate);
+    _presetService.addListener(_onPresetsChanged);
     _percentController.addListener(_calculate);
     _roundController.addListener(_calculate);
   }
@@ -197,6 +205,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   @override
   void dispose() {
     _monthsController.removeListener(_handleMonthsChanged);
+    _presetService.removeListener(_onPresetsChanged);
     _sumController.dispose();
     _monthsController.dispose();
     _initialController.dispose();
@@ -204,6 +213,104 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     _roundController.dispose();
     _monthsFocusNode.dispose();
     super.dispose();
+  }
+
+  void _onPresetsChanged() {
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _createPreset() async {
+    final result = await showCalcPresetModal(context: context);
+    if (result == null) return;
+    await _presetService.add(
+      title: result.title,
+      amount: result.amount,
+      months: result.months,
+      initial: result.initial,
+      percent: result.percent,
+      round: result.round,
+      mode: result.mode,
+    );
+  }
+
+  Future<void> _editPreset(CalcPreset preset) async {
+    final result = await showCalcPresetModal(
+      context: context,
+      editing: preset,
+    );
+    if (result == null) return;
+    await _presetService.update(
+      preset.copyWith(
+        title: result.title,
+        amount: result.amount,
+        months: result.months,
+        initial: result.initial,
+        percent: result.percent,
+        round: result.round,
+        mode: result.mode,
+      ),
+    );
+  }
+
+  Future<void> _showPresetMenu(CalcPreset preset) async {
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: const Color(AppColors.white),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: const Color(AppColors.uncomfPayment),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                preset.title,
+                style: AppStyle.manrope(
+                  size: 16,
+                  weight: FontWeight.w700,
+                  color: const Color(AppColors.black),
+                ),
+              ),
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              leading: const Icon(
+                Icons.edit_outlined,
+                color: Color(AppColors.primary),
+              ),
+              title: const Text('Редактировать'),
+              onTap: () => Navigator.pop(ctx, 'edit'),
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.delete_outline,
+                color: Color(AppColors.red),
+              ),
+              title: const Text('Удалить'),
+              onTap: () => Navigator.pop(ctx, 'delete'),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+    if (action == 'edit') {
+      await _editPreset(preset);
+    } else if (action == 'delete') {
+      await _presetService.remove(preset.id);
+    }
   }
 
   Rect? _sharePositionOrigin() {
@@ -833,7 +940,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     );
   }
 
-  void _applyPreset(_CalcPreset preset) {
+  void _applyPreset(CalcPreset preset) {
     _sumController.text = _formatCurrency(preset.amount.toDouble());
     _initialController.text = preset.initial == 0
         ? ''
@@ -847,17 +954,27 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   }
 
   Widget _buildPresetsSection() {
+    final presets = _presetService.presets;
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Шаблоны расчёта',
+            'Категории наценки',
             style: AppStyle.manrope(
               size: 14,
               weight: FontWeight.w600,
               color: const Color(AppColors.black),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Тап — применить, долгое нажатие — редактировать',
+            style: AppStyle.manrope(
+              size: 11,
+              weight: FontWeight.w400,
+              color: const Color(AppColors.uiBorder),
             ),
           ),
           const SizedBox(height: 8),
@@ -865,13 +982,17 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
             height: 40,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
-              itemCount: _kCalcPresets.length,
+              itemCount: presets.length + 1,
               separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
-                final preset = _kCalcPresets[index];
+                if (index == 0) {
+                  return _AddPresetChip(onTap: _createPreset);
+                }
+                final preset = presets[index - 1];
                 return _PresetChip(
-                  label: preset.title,
+                  label: '${preset.title} · ${preset.percent}%',
                   onTap: () => _applyPreset(preset),
+                  onLongPress: () => _showPresetMenu(preset),
                 );
               },
             ),
@@ -1237,72 +1358,26 @@ class PaymentLineBar extends StatelessWidget {
   }
 }
 
-enum CalculationMode { standard, afterInitial, monthlyPercent }
-
-class _CalcPreset {
-  final String title;
-  final int amount;
-  final int months;
-  final int initial;
-  final int percent;
-  final int round;
-  final CalculationMode mode;
-
-  const _CalcPreset({
-    required this.title,
-    required this.amount,
-    required this.months,
-    required this.initial,
-    required this.percent,
-    required this.round,
-    required this.mode,
-  });
-}
-
-const List<_CalcPreset> _kCalcPresets = [
-  _CalcPreset(
-    title: 'Микрозайм',
-    amount: 30000,
-    months: 3,
-    initial: 0,
-    percent: 35,
-    round: 50,
-    mode: CalculationMode.standard,
-  ),
-  _CalcPreset(
-    title: 'Потребительский',
-    amount: 200000,
-    months: 18,
-    initial: 0,
-    percent: 18,
-    round: 100,
-    mode: CalculationMode.standard,
-  ),
-  _CalcPreset(
-    title: 'Беспроцентный',
-    amount: 100000,
-    months: 12,
-    initial: 0,
-    percent: 0,
-    round: 100,
-    mode: CalculationMode.standard,
-  ),
-];
-
 class _PresetChip extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
-  const _PresetChip({required this.label, required this.onTap});
+  const _PresetChip({
+    required this.label,
+    required this.onTap,
+    this.onLongPress,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: const Color(0xFFE6F7F4),
+      color: const Color(AppColors.greenTie),
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: onTap,
+        onLongPress: onLongPress,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           child: Row(
@@ -1316,6 +1391,52 @@ class _PresetChip extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 label,
+                style: AppStyle.manrope(
+                  size: 13,
+                  weight: FontWeight.w600,
+                  color: const Color(AppColors.primary),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AddPresetChip extends StatelessWidget {
+  final VoidCallback onTap;
+  const _AddPresetChip({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: const Color(AppColors.white),
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: const Color(AppColors.primary),
+              width: 1.2,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.add,
+                size: 16,
+                color: Color(AppColors.primary),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'Создать',
                 style: AppStyle.manrope(
                   size: 13,
                   weight: FontWeight.w600,

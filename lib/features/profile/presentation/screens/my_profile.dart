@@ -1,5 +1,6 @@
 import 'package:blacklist_plus_flutter/assets/resources.dart';
 import 'package:blacklist_plus_flutter/core/storage/user_storage.dart';
+import 'package:blacklist_plus_flutter/core/widgets/app_dialog.dart';
 import 'package:blacklist_plus_flutter/core/widgets/helpers.dart';
 import 'package:blacklist_plus_flutter/core/widgets/refresh.dart';
 import 'package:blacklist_plus_flutter/features/profile/data/models/employee.dart';
@@ -49,25 +50,15 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   }
 
   Future<void> _deletePhoto() async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppConfirmDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Удалить фото?'),
-        content: const Text('Вы уверены, что хотите удалить фотографию?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Удалить'),
-          ),
-        ],
-      ),
+      title: 'Удалить фото?',
+      message: 'Вы уверены, что хотите удалить фотографию?',
+      confirmText: 'Удалить',
+      destructive: true,
     );
 
-    if (confirmed == true) {
+    if (confirmed) {
       try {
         await context.read<ProfileCubit>().deleteEmployeePhoto();
       } catch (e) {

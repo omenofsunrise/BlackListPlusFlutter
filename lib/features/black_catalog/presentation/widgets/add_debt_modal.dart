@@ -1,3 +1,4 @@
+import 'package:blacklist_plus_flutter/core/widgets/app_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:waypay_flutter_library/waypay_styles.dart';
@@ -92,8 +93,8 @@ class _AddDebtDialogState extends State<_AddDebtDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Добавить долг'),
+    return AppDialog(
+      title: 'Добавить долг',
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,7 +102,11 @@ class _AddDebtDialogState extends State<_AddDebtDialog> {
           if (widget.itemName.isNotEmpty) ...[
             Text(
               widget.itemName,
-              style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+              style: AppStyle.manrope(
+                size: 14,
+                weight: FontWeight.w400,
+                color: const Color(AppColors.uiBorder),
+              ),
             ),
             const SizedBox(height: 12),
           ],
@@ -120,12 +125,11 @@ class _AddDebtDialogState extends State<_AddDebtDialog> {
         ],
       ),
       actions: [
-        TextButton(
+        AppDialogCancelButton(
           onPressed: _submitting ? null : () => Navigator.of(context).pop(),
-          child: const Text('Отмена'),
         ),
         SizedBox(
-          width: 120,
+          width: 140,
           child: DefaultButton(
             text: 'Добавить',
             isPrimary: true,

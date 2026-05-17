@@ -1,39 +1,24 @@
 import 'package:blacklist_plus_flutter/core/di/dependency_injection.dart';
+import 'package:blacklist_plus_flutter/core/widgets/app_dialog.dart';
 import 'package:blacklist_plus_flutter/features/auth/data/data_sources/auth_remote_data_source.dart';
 import 'package:flutter/material.dart';
-import 'package:waypay_flutter_library/waypay_styles.dart';
 
+/// Совместимая обёртка над [showAppConfirmDialog].
+/// Оставлена для существующих вызовов; новый код используйте напрямую.
 Future<bool> showConfirmDialog({
   required BuildContext context,
   String title = 'Подтвердите удаление',
   String content = 'Вы действительно хотите удалить клиента?',
   String cancelText = 'Отмена',
   String confirmText = 'Подтвердить',
-}) async {
-  final result = await showDialog<bool>(
+}) {
+  return showAppConfirmDialog(
     context: context,
-    builder: (_) => AlertDialog(
-      backgroundColor: Color(AppColors.background),
-      title: Text(title),
-      content: Text(content),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          style: TextButton.styleFrom(backgroundColor: Colors.transparent),
-          child: Text(cancelText, style: const TextStyle(color: Colors.black)),
-        ),
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(true),
-          style: TextButton.styleFrom(
-            backgroundColor: const Color(AppColors.primary),
-          ),
-          child: Text(confirmText, style: const TextStyle(color: Colors.white)),
-        ),
-      ],
-    ),
+    title: title,
+    message: content,
+    cancelText: cancelText,
+    confirmText: confirmText,
   );
-
-  return result == true;
 }
 
 void showMessage(String message, BuildContext context) {

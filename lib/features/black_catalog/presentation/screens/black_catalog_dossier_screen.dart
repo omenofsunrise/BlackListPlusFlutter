@@ -1,4 +1,5 @@
 import 'package:blacklist_plus_flutter/core/di/dependency_injection.dart';
+import 'package:blacklist_plus_flutter/core/widgets/app_dialog.dart';
 import 'package:blacklist_plus_flutter/features/auth/data/data_sources/auth_remote_data_source.dart';
 import 'package:blacklist_plus_flutter/features/black_catalog/data/data_sources/black_catalog_remote_data_source.dart';
 import 'package:blacklist_plus_flutter/features/black_catalog/data/models/black_catalog_item.dart';
@@ -58,27 +59,14 @@ class _BlackCatalogDossierScreenState extends State<BlackCatalogDossierScreen> {
   }
 
   Future<void> _deleteDebt(int debtId) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppConfirmDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Удалить долг?'),
-        content: const Text('Вы уверены, что хотите удалить этот долг?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'Удалить',
-              style: TextStyle(color: Color(AppColors.red)),
-            ),
-          ),
-        ],
-      ),
+      title: 'Удалить долг?',
+      message: 'Вы уверены, что хотите удалить этот долг?',
+      confirmText: 'Удалить',
+      destructive: true,
     );
-    if (confirmed != true) return;
+    if (!confirmed) return;
     try {
       await _dataSource.deleteDebt(debtId);
       await _refreshItem();

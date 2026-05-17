@@ -1,3 +1,4 @@
+import 'package:blacklist_plus_flutter/core/widgets/app_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
@@ -121,87 +122,67 @@ class _AddLocalDebtDialogState extends State<_AddLocalDebtDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      backgroundColor: const Color(AppColors.white),
-      title: Text(
-        'Добавить долг',
-        style: AppStyle.manrope(
-          size: 18,
-          weight: FontWeight.w700,
-          color: const Color(AppColors.black),
-        ),
-      ),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ModalTextField(
-              controller: _nameController,
-              label: 'Имя должника',
-              hintText: 'Например, Иван Петров',
-              errorText: _nameError,
-              keyboardType: TextInputType.name,
-            ),
-            const SizedBox(height: 12),
-            ModalTextField(
-              controller: _amountController,
-              label: 'Сумма, ₽',
-              hintText: '0',
-              errorText: _amountError,
-              keyboardType: const TextInputType.numberWithOptions(),
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-                CurrencyInputFormatter(
-                  thousandSeparator: ThousandSeparator.Space,
-                  mantissaLength: 0,
-                  trailingSymbol: '',
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            DateInput(
-              controller: _dateController,
-              label: 'Дата возврата (необязательно)',
-              onDateSelected: _onDateSelected,
-              prefix: 'Возврат до:',
-            ),
-            if (_dateError != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 6, left: 4),
-                child: Text(
-                  _dateError!,
-                  style: AppStyle.manrope(
-                    size: 12,
-                    weight: FontWeight.w400,
-                    color: const Color(AppColors.red),
-                  ),
+    return AppDialog(
+      title: 'Добавить долг',
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ModalTextField(
+            controller: _nameController,
+            label: 'Имя должника',
+            hintText: 'Например, Иван Петров',
+            errorText: _nameError,
+            keyboardType: TextInputType.name,
+          ),
+          const SizedBox(height: 12),
+          ModalTextField(
+            controller: _amountController,
+            label: 'Сумма, ₽',
+            hintText: '0',
+            errorText: _amountError,
+            keyboardType: const TextInputType.numberWithOptions(),
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              CurrencyInputFormatter(
+                thousandSeparator: ThousandSeparator.Space,
+                mantissaLength: 0,
+                trailingSymbol: '',
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          DateInput(
+            controller: _dateController,
+            label: 'Дата возврата (необязательно)',
+            onDateSelected: _onDateSelected,
+            prefix: 'Возврат до:',
+          ),
+          if (_dateError != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 6, left: 4),
+              child: Text(
+                _dateError!,
+                style: AppStyle.manrope(
+                  size: 12,
+                  weight: FontWeight.w400,
+                  color: const Color(AppColors.red),
                 ),
               ),
-            const SizedBox(height: 12),
-            ModalTextField(
-              controller: _commentController,
-              label: 'Комментарий (необязательно)',
-              hintText: 'За что / на что',
-              keyboardType: TextInputType.text,
             ),
-          ],
-        ),
+          const SizedBox(height: 12),
+          ModalTextField(
+            controller: _commentController,
+            label: 'Комментарий (необязательно)',
+            hintText: 'За что / на что',
+            keyboardType: TextInputType.text,
+          ),
+        ],
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(
-            'Отмена',
-            style: AppStyle.manrope(
-              size: 14,
-              weight: FontWeight.w500,
-              color: const Color(AppColors.uiBorder),
-            ),
-          ),
-        ),
+        const AppDialogCancelButton(),
         SizedBox(
-          width: 130,
+          width: 140,
           child: DefaultButton(
             text: 'Сохранить',
             isPrimary: true,

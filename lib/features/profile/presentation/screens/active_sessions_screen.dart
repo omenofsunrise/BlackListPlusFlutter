@@ -1,5 +1,6 @@
 import 'package:blacklist_plus_flutter/core/di/dependency_injection.dart';
 import 'package:blacklist_plus_flutter/core/network/token_storage.dart';
+import 'package:blacklist_plus_flutter/core/widgets/app_dialog.dart';
 import 'package:blacklist_plus_flutter/features/auth/data/data_sources/auth_remote_data_source.dart';
 import 'package:blacklist_plus_flutter/features/auth/data/models/session_model.dart';
 import 'package:blacklist_plus_flutter/routes/routes.dart';
@@ -46,29 +47,16 @@ class _ActiveSessionsScreenState extends State<ActiveSessionsScreen> {
   }
 
   Future<void> _revoke(SessionModel s) async {
-    final agreed = await showDialog<bool>(
+    final agreed = await showAppConfirmDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: Colors.white,
-        title: const Text('Завершить сессию?'),
-        content: Text(
-          s.isCurrentSession
-              ? 'Вы собираетесь завершить ТЕКУЩУЮ сессию. После этого потребуется повторный вход.'
-              : 'Вы уверены, что хотите завершить выбранную сессию?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Завершить'),
-          ),
-        ],
-      ),
+      title: 'Завершить сессию?',
+      message: s.isCurrentSession
+          ? 'Вы собираетесь завершить ТЕКУЩУЮ сессию. После этого потребуется повторный вход.'
+          : 'Вы уверены, что хотите завершить выбранную сессию?',
+      confirmText: 'Завершить',
+      destructive: true,
     );
-    if (agreed != true) return;
+    if (!agreed) return;
 
     showDialog(
       context: context,

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:blacklist_plus_flutter/core/widgets/app_dialog.dart';
 import 'package:blacklist_plus_flutter/features/black_catalog/data/models/black_catalog_item.dart';
 import 'package:blacklist_plus_flutter/features/black_catalog/presentation/cubit/my_black_catalog_cubit.dart';
 import 'package:blacklist_plus_flutter/features/black_catalog/presentation/widgets/black_catalog_card.dart';
@@ -69,30 +70,16 @@ class _ProfileBlackCatalogState extends State<ProfileBlackCatalog> {
   }
 
   Future<void> _confirmDelete(BlackCatalogItem item) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppConfirmDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Удалить запись?'),
-        content: Text(
+      title: 'Удалить запись?',
+      message:
           'Вы уверены, что хотите удалить ${item.fullname} из чёрного каталога?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'Удалить',
-              style: TextStyle(color: Color(0xFFEF4444)),
-            ),
-          ),
-        ],
-      ),
+      confirmText: 'Удалить',
+      destructive: true,
     );
 
-    if (confirmed == true) {
+    if (confirmed) {
       try {
         await _cubit.deleteItem(item.id);
       } catch (e) {

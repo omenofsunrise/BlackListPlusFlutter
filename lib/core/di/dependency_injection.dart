@@ -9,6 +9,7 @@ import 'package:blacklist_plus_flutter/features/profile/data/data_sources/employ
 import 'package:blacklist_plus_flutter/features/profile/presentation/bloc/employees_bloc.dart';
 import 'package:blacklist_plus_flutter/features/profile/presentation/cubit/credit_stats_cubit.dart';
 import 'package:blacklist_plus_flutter/features/profile/presentation/cubit/payment_stats_cubit.dart';
+import 'package:blacklist_plus_flutter/features/calc/data/calc_preset_service.dart';
 import 'package:blacklist_plus_flutter/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:blacklist_plus_flutter/features/stats/data/debt_export_service.dart';
 import 'package:blacklist_plus_flutter/features/stats/data/debt_reminder_service.dart';
@@ -35,6 +36,7 @@ Future<void> initDependencies() async {
     LocalDebtService(prefs, reminderService),
   );
   getIt.registerSingleton<DebtExportService>(DebtExportService());
+  getIt.registerSingleton<CalcPresetService>(CalcPresetService(prefs));
 
   getIt.registerLazySingleton(() => createDio());
   getIt.registerLazySingleton(() => TokenStorage());

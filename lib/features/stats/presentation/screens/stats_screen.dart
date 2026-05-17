@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:blacklist_plus_flutter/assets/resources.dart';
 import 'package:blacklist_plus_flutter/core/di/dependency_injection.dart';
+import 'package:blacklist_plus_flutter/core/widgets/app_dialog.dart';
 import 'package:blacklist_plus_flutter/features/stats/data/debt_export_service.dart';
 import 'package:blacklist_plus_flutter/features/stats/data/debt_reminder_service.dart';
 import 'package:blacklist_plus_flutter/features/stats/data/local_debt.dart';
@@ -289,29 +290,15 @@ class _StatsScreenState extends State<StatsScreen> {
   }
 
   Future<void> _confirmRemove(LocalDebt debt) async {
-    final ok = await showDialog<bool>(
+    final ok = await showAppConfirmDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Удалить запись?'),
-        content: Text(
+      title: 'Удалить запись?',
+      message:
           'Удалить долг "${debt.debtorName} — ${_money(debt.amountRub)} ₽" из вашего журнала?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text(
-              'Удалить',
-              style: TextStyle(color: Color(AppColors.red)),
-            ),
-          ),
-        ],
-      ),
+      confirmText: 'Удалить',
+      destructive: true,
     );
-    if (ok == true) {
+    if (ok) {
       await _debts.remove(debt.id);
     }
   }
@@ -423,7 +410,7 @@ class _StatsScreenState extends State<StatsScreen> {
             ),
             const SizedBox(height: 12),
             if (_debts.debts.isEmpty)
-              _EmptyDebts()
+              const _EmptyDebts()
             else
               for (final debt in _debts.debts) ...[
                 _DebtCard(
@@ -889,6 +876,8 @@ class _MetaText extends StatelessWidget {
 }
 
 class _EmptyDebts extends StatelessWidget {
+  const _EmptyDebts();
+
   @override
   Widget build(BuildContext context) {
     return Container(
