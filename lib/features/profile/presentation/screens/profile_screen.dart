@@ -4,6 +4,7 @@ import 'package:blacklist_plus_flutter/features/black_catalog/presentation/widge
 import 'package:blacklist_plus_flutter/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:waypay_flutter_library/waypay_styles.dart';
 
 class ProfileScreen extends StatefulWidget {
   final int? employeeId;
@@ -117,6 +118,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       logoutRedHover: _logoutRedHover,
                       isLoggingOut: _loggingOut,
                       onLogout: _loggingOut ? null : _handleLogout,
+                    ),
+                    const SizedBox(height: 16),
+                    _NavTile(
+                      icon: Icons.bar_chart_rounded,
+                      title: 'Статистика и долги',
+                      subtitle:
+                          'Стрик, активность и журнал долгов в рублях (локально)',
+                      onTap: () => context.pushNamed(
+                        Routes.statsScreen.toName,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    _NavTile(
+                      icon: Icons.description_outlined,
+                      title: 'Шаблоны документов',
+                      subtitle: 'Бланки расписки, акта и уведомления (.docx)',
+                      onTap: () => context.pushNamed(
+                        Routes.templatesScreen.toName,
+                      ),
                     ),
                     const SizedBox(height: 24),
                     const ProfileBlackCatalog(allowEdit: true, pageSize: 10),
@@ -308,6 +328,93 @@ class _LogoutButtonState extends State<_LogoutButton> {
                 'Выйти из аккаунта',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
+      ),
+    );
+  }
+}
+
+class _NavTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _NavTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: const Color(AppColors.white),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Ink(
+          decoration: BoxDecoration(
+            color: const Color(AppColors.white),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x1A000000),
+                blurRadius: 8,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: const Color(AppColors.greenTie),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  icon,
+                  size: 22,
+                  color: const Color(AppColors.primary),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: AppStyle.manrope(
+                        size: 16,
+                        weight: FontWeight.w600,
+                        color: const Color(AppColors.black),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: AppStyle.manrope(
+                        size: 13,
+                        weight: FontWeight.w400,
+                        color: const Color(AppColors.uiBorder),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.chevron_right,
+                color: Color(AppColors.borderColor),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

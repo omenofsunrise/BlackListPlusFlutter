@@ -1,9 +1,11 @@
 import 'dart:io';
 import 'package:blacklist_plus_flutter/assets/resources.dart';
+import 'package:blacklist_plus_flutter/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -757,6 +759,17 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
+                    icon: const Icon(
+                      Icons.description_outlined,
+                      size: 24,
+                      color: Color(AppColors.black),
+                    ),
+                    tooltip: 'Шаблоны документов',
+                    onPressed: () => context.pushNamed(
+                      Routes.templatesScreen.toName,
+                    ),
+                  ),
+                  IconButton(
                     icon: SvgPicture.asset(
                       SvgIcons.calcMode,
                       width: 24,
@@ -820,9 +833,59 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
     );
   }
 
+  void _applyPreset(_CalcPreset preset) {
+    _sumController.text = _formatCurrency(preset.amount.toDouble());
+    _initialController.text = preset.initial == 0
+        ? ''
+        : _formatCurrency(preset.initial.toDouble());
+    _percentController.text = preset.percent.toString();
+    _roundController.text = preset.round.toString();
+    setState(() {
+      _calculationMode = preset.mode;
+    });
+    _updateMonths(preset.months);
+  }
+
+  Widget _buildPresetsSection() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Шаблоны расчёта',
+            style: AppStyle.manrope(
+              size: 14,
+              weight: FontWeight.w600,
+              color: const Color(AppColors.black),
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 40,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: _kCalcPresets.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
+              itemBuilder: (context, index) {
+                final preset = _kCalcPresets[index];
+                return _PresetChip(
+                  label: preset.title,
+                  onTap: () => _applyPreset(preset),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInputSection() {
     return Column(
       children: [
+        _buildPresetsSection(),
         _buildFloatingTextField(
           controller: _sumController,
           hint: 'Сумма рассрочки, ₽',
@@ -1175,3 +1238,94 @@ class PaymentLineBar extends StatelessWidget {
 }
 
 enum CalculationMode { standard, afterInitial, monthlyPercent }
+
+class _CalcPreset {
+  final String title;
+  final int amount;
+  final int months;
+  final int initial;
+  final int percent;
+  final int round;
+  final CalculationMode mode;
+
+  const _CalcPreset({
+    required this.title,
+    required this.amount,
+    required this.months,
+    required this.initial,
+    required this.percent,
+    required this.round,
+    required this.mode,
+  });
+}
+
+const List<_CalcPreset> _kCalcPresets = [
+  _CalcPreset(
+    title: 'Микрозайм',
+    amount: 30000,
+    months: 3,
+    initial: 0,
+    percent: 35,
+    round: 50,
+    mode: CalculationMode.standard,
+  ),
+  _CalcPreset(
+    title: 'Потребительский',
+    amount: 200000,
+    months: 18,
+    initial: 0,
+    percent: 18,
+    round: 100,
+    mode: CalculationMode.standard,
+  ),
+  _CalcPreset(
+    title: 'Беспроцентный',
+    amount: 100000,
+    months: 12,
+    initial: 0,
+    percent: 0,
+    round: 100,
+    mode: CalculationMode.standard,
+  ),
+];
+
+class _PresetChip extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+
+  const _PresetChip({required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: const Color(0xFFE6F7F4),
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.bolt_outlined,
+                size: 16,
+                color: Color(AppColors.primary),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: AppStyle.manrope(
+                  size: 13,
+                  weight: FontWeight.w600,
+                  color: const Color(AppColors.primary),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

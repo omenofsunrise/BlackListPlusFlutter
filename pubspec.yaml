@@ -48,6 +48,9 @@ dependencies:
   flutter_link_previewer: ^4.1.2
   flutter_launcher_icons: ^0.14.4
   http: ^1.5.0
+  flutter_local_notifications: ^17.2.3
+  timezone: ^0.9.4
+  flutter_timezone: ^3.0.1
   waypay_flutter_library:
     path: packages/waypay_flutter_library
 
@@ -61,6 +64,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/templates/
     - assets/fonts/Roboto-Regular.ttf
     - assets/fonts/Roboto-Bold.ttf
   fonts:

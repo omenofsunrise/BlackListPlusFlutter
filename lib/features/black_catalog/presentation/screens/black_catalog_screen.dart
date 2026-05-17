@@ -7,6 +7,7 @@ import 'package:blacklist_plus_flutter/features/black_catalog/presentation/cubit
 import 'package:blacklist_plus_flutter/features/black_catalog/presentation/widgets/add_debt_modal.dart';
 import 'package:blacklist_plus_flutter/features/black_catalog/presentation/widgets/black_catalog_card.dart';
 import 'package:blacklist_plus_flutter/features/black_catalog/presentation/widgets/black_catalog_form_modal.dart';
+import 'package:blacklist_plus_flutter/features/stats/data/local_stats_service.dart';
 import 'package:blacklist_plus_flutter/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -158,6 +159,7 @@ class _BlackCatalogScreenState extends State<BlackCatalogScreen> {
         isSwindler: result.isSwindler,
         debtEndingAt: result.debtEndingAt,
       );
+      unawaited(getIt<LocalStatsService>().recordAdd());
     } catch (e) {
       _showError('Ошибка при сохранении: $e');
     }
@@ -224,12 +226,14 @@ class _BlackCatalogScreenState extends State<BlackCatalogScreen> {
     if (confirmed != true) return;
     try {
       await _cubit.deleteItem(item.id);
+      unawaited(getIt<LocalStatsService>().recordDelete());
     } catch (e) {
       _showError('Не удалось удалить: $e');
     }
   }
 
   void _openDossier(BlackCatalogItem item) {
+    unawaited(getIt<LocalStatsService>().recordView());
     context.pushNamed(Routes.blackCatalogDossierScreen.toName, extra: item);
   }
 

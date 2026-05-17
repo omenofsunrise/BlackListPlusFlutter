@@ -10,14 +10,32 @@ import 'package:blacklist_plus_flutter/features/profile/presentation/bloc/employ
 import 'package:blacklist_plus_flutter/features/profile/presentation/cubit/credit_stats_cubit.dart';
 import 'package:blacklist_plus_flutter/features/profile/presentation/cubit/payment_stats_cubit.dart';
 import 'package:blacklist_plus_flutter/features/profile/presentation/cubit/profile_cubit.dart';
+import 'package:blacklist_plus_flutter/features/stats/data/debt_export_service.dart';
+import 'package:blacklist_plus_flutter/features/stats/data/debt_reminder_service.dart';
+import 'package:blacklist_plus_flutter/features/stats/data/local_debt_service.dart';
+import 'package:blacklist_plus_flutter/features/stats/data/local_stats_service.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../network/dio_client.dart';
 import '../network/token_storage.dart';
 
 final getIt = GetIt.instance;
 
 Future<void> initDependencies() async {
+  final prefs = await SharedPreferences.getInstance();
+  getIt.registerSingleton<SharedPreferences>(prefs);
+  getIt.registerSingleton<LocalStatsService>(LocalStatsService(prefs));
+
+  final reminderService = DebtReminderService();
+  await reminderService.init();
+  getIt.registerSingleton<DebtReminderService>(reminderService);
+
+  getIt.registerSingleton<LocalDebtService>(
+    LocalDebtService(prefs, reminderService),
+  );
+  getIt.registerSingleton<DebtExportService>(DebtExportService());
+
   getIt.registerLazySingleton(() => createDio());
   getIt.registerLazySingleton(() => TokenStorage());
   getIt.registerLazySingleton<UserStorage>(() => UserStorage());

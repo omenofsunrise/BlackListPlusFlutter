@@ -43,6 +43,9 @@ enum Routes {
   companyDataScreen,
   privacyPolicyScreen,
   privacyPolicyIntroScreen,
+  templatesScreen,
+  templateDetailScreen,
+  statsScreen,
 }
 
 extension RoutesExtension on Routes {
@@ -136,6 +139,12 @@ extension RoutesExtension on Routes {
         return '/privacy_policy_screen';
       case Routes.privacyPolicyIntroScreen:
         return '/privacy_policy_intro_screen';
+      case Routes.templatesScreen:
+        return '/templates_screen';
+      case Routes.templateDetailScreen:
+        return '/template_detail_screen';
+      case Routes.statsScreen:
+        return '/stats_screen';
     }
   }
 
@@ -229,6 +238,12 @@ extension RoutesExtension on Routes {
         return 'PRIVACY_POLICY_SCREEN';
       case Routes.privacyPolicyIntroScreen:
         return 'PRIVACY_POLICY_INTRO_SCREEN';
+      case Routes.templatesScreen:
+        return 'TEMPLATES_SCREEN';
+      case Routes.templateDetailScreen:
+        return 'TEMPLATE_DETAIL_SCREEN';
+      case Routes.statsScreen:
+        return 'STATS_SCREEN';
     }
   }
 }

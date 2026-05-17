@@ -17,6 +17,10 @@ import 'package:blacklist_plus_flutter/features/profile/presentation/screens/add
 import 'package:blacklist_plus_flutter/features/profile/presentation/screens/employees_screen.dart';
 import 'package:blacklist_plus_flutter/features/profile/presentation/screens/profile_screen.dart';
 import 'package:blacklist_plus_flutter/features/profile/presentation/screens/profile_statistics_screen.dart';
+import 'package:blacklist_plus_flutter/features/stats/presentation/screens/stats_screen.dart';
+import 'package:blacklist_plus_flutter/features/templates/data/document_template.dart';
+import 'package:blacklist_plus_flutter/features/templates/presentation/screens/template_detail_screen.dart';
+import 'package:blacklist_plus_flutter/features/templates/presentation/screens/templates_screen.dart';
 import 'package:blacklist_plus_flutter/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -195,6 +199,29 @@ class AppRouter {
           }
           return BlackCatalogDossierScreen(initialItem: item);
         },
+      ),
+      GoRoute(
+        path: Routes.templatesScreen.toPath,
+        name: Routes.templatesScreen.toName,
+        builder: (context, state) => const TemplatesScreen(),
+      ),
+      GoRoute(
+        path: Routes.templateDetailScreen.toPath,
+        name: Routes.templateDetailScreen.toName,
+        builder: (context, state) {
+          final template = state.extra as DocumentTemplate?;
+          if (template == null) {
+            return const Scaffold(
+              body: Center(child: Text('Шаблон не передан')),
+            );
+          }
+          return TemplateDetailScreen(template: template);
+        },
+      ),
+      GoRoute(
+        path: Routes.statsScreen.toPath,
+        name: Routes.statsScreen.toName,
+        builder: (context, state) => const StatsScreen(),
       ),
     ],
   );

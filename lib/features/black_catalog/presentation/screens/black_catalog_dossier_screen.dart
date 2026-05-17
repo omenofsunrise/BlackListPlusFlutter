@@ -8,6 +8,7 @@ import 'package:blacklist_plus_flutter/features/black_catalog/presentation/cubit
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:waypay_flutter_library/waypay_styles.dart';
 
 class BlackCatalogDossierScreen extends StatefulWidget {
   final BlackCatalogItem initialItem;
@@ -71,7 +72,7 @@ class _BlackCatalogDossierScreenState extends State<BlackCatalogDossierScreen> {
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text(
               'Удалить',
-              style: TextStyle(color: Color(0xFFEF4444)),
+              style: TextStyle(color: Color(AppColors.red)),
             ),
           ),
         ],
@@ -103,46 +104,55 @@ class _BlackCatalogDossierScreenState extends State<BlackCatalogDossierScreen> {
     final isBlacklist = (_item.isSwindler ?? false) || !hasActiveDebt;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(AppColors.white),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(56),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Header(
+              title: 'Досье',
+              showBackButton: true,
+              showNotifications: false,
+              showAvatar: false,
+              onBackPressed: () => Navigator.of(context).maybePop(),
+            ),
+          ),
+        ),
+      ),
       body: SafeArea(
+        top: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextButton.icon(
-                onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.arrow_back),
-                label: const Text('Назад к поиску'),
-                style: TextButton.styleFrom(
-                  foregroundColor: const Color(0xFF111827),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-
               Text(
                 _item.fullname,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF111827),
+                style: AppStyle.manrope(
+                  size: 22,
+                  weight: FontWeight.w700,
+                  color: const Color(AppColors.black),
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 'ID: ${_item.id}',
-                style: const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF)),
+                style: AppStyle.manrope(
+                  size: 12,
+                  weight: FontWeight.w400,
+                  color: const Color(AppColors.borderColor),
+                ),
               ),
-              const SizedBox(height: 10),
-              _StatusBadge(isBlacklist: isBlacklist),
-              const SizedBox(height: 18),
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: _StatusBadge(isBlacklist: isBlacklist),
+              ),
+              const SizedBox(height: 24),
 
               const _SectionTitle('Общая информация'),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               Wrap(
                 spacing: 24,
                 runSpacing: 16,
@@ -173,11 +183,11 @@ class _BlackCatalogDossierScreenState extends State<BlackCatalogDossierScreen> {
               ),
 
               if (activeDebts.isNotEmpty || expiredDebts.isNotEmpty) ...[
-                const SizedBox(height: 18),
-                const Divider(color: Color(0xFFD1D5DB)),
-                const SizedBox(height: 8),
+                const SizedBox(height: 24),
+                const Divider(color: Color(AppColors.uncomfPayment)),
+                const SizedBox(height: 16),
                 const _SectionTitle('Оформления'),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Wrap(
                   spacing: 10,
                   runSpacing: 10,
@@ -203,8 +213,10 @@ class _BlackCatalogDossierScreenState extends State<BlackCatalogDossierScreen> {
               ],
 
               const SizedBox(height: 24),
+              const Divider(color: Color(AppColors.uncomfPayment)),
+              const SizedBox(height: 16),
               const _SectionTitle('Комментарии'),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               if (_currentUserId != null)
                 BlocProvider(
                   create: (_) => CommentsCubit(
@@ -240,10 +252,10 @@ class _SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: Color(0xFF374151),
+      style: AppStyle.manrope(
+        size: 15,
+        weight: FontWeight.w700,
+        color: const Color(AppColors.black),
       ),
     );
   }
@@ -265,10 +277,10 @@ class _InfoCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = isWarning
-        ? const Color(0xFFEF4444)
+        ? const Color(AppColors.red)
         : isDebt
-        ? const Color(0xFFB45309)
-        : const Color(0xFF111827);
+            ? const Color(0xFFB45309)
+            : const Color(AppColors.black);
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 140),
       child: Column(
@@ -277,14 +289,18 @@ class _InfoCell extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+            style: AppStyle.manrope(
+              size: 12,
+              weight: FontWeight.w400,
+              color: const Color(AppColors.uiBorder),
+            ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
+            style: AppStyle.manrope(
+              size: 14,
+              weight: FontWeight.w600,
               color: color,
             ),
           ),
@@ -301,7 +317,7 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = isBlacklist ? Colors.black : const Color(0xFFF59E0B);
-    final fg = isBlacklist ? const Color(0xFFEF4444) : Colors.white;
+    final fg = isBlacklist ? const Color(AppColors.red) : Colors.white;
     final text = isBlacklist ? 'Чёрный список' : 'Есть оформления';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -310,11 +326,10 @@ class _StatusBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
         boxShadow: [
           BoxShadow(
-            color:
-                (isBlacklist
-                        ? const Color(0xFFEF4444)
-                        : const Color(0xFFF59E0B))
-                    .withOpacity(0.5),
+            color: (isBlacklist
+                    ? const Color(AppColors.red)
+                    : const Color(0xFFF59E0B))
+                .withOpacity(0.5),
             blurRadius: 12,
             offset: const Offset(0, 2),
           ),
@@ -327,7 +342,11 @@ class _StatusBadge extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             text,
-            style: TextStyle(color: fg, fontWeight: FontWeight.w700),
+            style: AppStyle.manrope(
+              size: 13,
+              weight: FontWeight.w700,
+              color: fg,
+            ),
           ),
         ],
       ),
@@ -350,9 +369,10 @@ class _DebtBadgeRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = expired ? const Color(0xFF9CA3AF) : const Color(0xFFFEF3C7);
+    final bg = expired ? const Color(0xFFE5E7EB) : const Color(0xFFFEF3C7);
     final fg = expired ? const Color(0xFF4B5563) : const Color(0xFFB45309);
-    final border = expired ? const Color(0xFFD1D5DB) : const Color(0xFFFDE68A);
+    final border =
+        expired ? const Color(AppColors.uncomfPayment) : const Color(0xFFFDE68A);
     final dateStr = _formatDate(debt.debtEndingAt);
     final label = expired ? 'закрыто $dateStr' : 'до $dateStr';
 
@@ -374,9 +394,9 @@ class _DebtBadgeRow extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
+            style: AppStyle.manrope(
+              size: 13,
+              weight: FontWeight.w500,
               color: fg,
             ),
           ),
@@ -387,7 +407,7 @@ class _DebtBadgeRow extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
               child: const Padding(
                 padding: EdgeInsets.all(4),
-                child: Icon(Icons.close, size: 14, color: Color(0xFFEF4444)),
+                child: Icon(Icons.close, size: 14, color: Color(AppColors.red)),
               ),
             ),
           ],
@@ -468,15 +488,20 @@ class _CommentsSectionState extends State<_CommentsSection> {
               ),
             ] else if (state is CommentsLoaded) ...[
               if (state.comments.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Text(
                     'Комментариев пока нет',
-                    style: TextStyle(color: Color(0xFF6B7280)),
+                    style: AppStyle.manrope(
+                      size: 13,
+                      weight: FontWeight.w400,
+                      color: const Color(AppColors.uiBorder),
+                    ),
                   ),
                 )
               else
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: state.comments
                       .where((c) => c.parentId == null)
                       .map((c) => _commentCard(c, cubit))
@@ -485,49 +510,26 @@ class _CommentsSectionState extends State<_CommentsSection> {
             ],
 
             const SizedBox(height: 12),
-            TextField(
+            ModalTextField(
               controller: _controller,
+              label: 'Добавить комментарий',
+              hintText: 'Опишите ситуацию',
+              maxLines: 4,
               minLines: 3,
-              maxLines: 6,
-              decoration: InputDecoration(
-                hintText: 'Добавить комментарий',
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 12,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Color(0xFFD1D5DB)),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(
-                    color: Color(0xFF007D88),
-                    width: 1.5,
-                  ),
-                ),
-              ),
+              keyboardType: TextInputType.multiline,
             ),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: ElevatedButton(
+            const SizedBox(height: 10),
+            SizedBox(
+              width: 140,
+              child: DefaultButton(
+                text: 'Добавить',
+                isPrimary: true,
                 onPressed: () async {
                   final text = _controller.text.trim();
                   if (text.isEmpty) return;
                   await cubit.create(text);
                   _controller.clear();
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF007D88),
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Добавить'),
               ),
             ),
           ],
@@ -546,51 +548,69 @@ class _CommentsSectionState extends State<_CommentsSection> {
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        color: const Color(AppColors.white),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(AppColors.uncomfPayment)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             createdAt,
-            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+            style: AppStyle.manrope(
+              size: 12,
+              weight: FontWeight.w400,
+              color: const Color(AppColors.uiBorder),
+            ),
           ),
           const SizedBox(height: 6),
           if (isEditingThis) ...[
-            TextField(
+            ModalTextField(
               controller: _editController,
+              label: 'Редактирование',
+              maxLines: 4,
               minLines: 2,
-              maxLines: 6,
-              decoration: InputDecoration(
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 10,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
+              keyboardType: TextInputType.multiline,
             ),
             const SizedBox(height: 8),
             Row(
               children: [
                 TextButton(
                   onPressed: () => _saveEdit(cubit),
-                  child: const Text('Сохранить'),
+                  child: Text(
+                    'Сохранить',
+                    style: AppStyle.manrope(
+                      size: 13,
+                      weight: FontWeight.w600,
+                      color: const Color(AppColors.primary),
+                    ),
+                  ),
                 ),
-                TextButton(onPressed: _cancelEdit, child: const Text('Отмена')),
+                TextButton(
+                  onPressed: _cancelEdit,
+                  child: Text(
+                    'Отмена',
+                    style: AppStyle.manrope(
+                      size: 13,
+                      weight: FontWeight.w500,
+                      color: const Color(AppColors.uiBorder),
+                    ),
+                  ),
+                ),
               ],
             ),
           ] else ...[
             Text(
               comment.content,
-              style: const TextStyle(fontSize: 14, color: Color(0xFF111827)),
+              style: AppStyle.manrope(
+                size: 14,
+                weight: FontWeight.w400,
+                height: 1.4,
+                color: const Color(AppColors.black),
+              ),
             ),
             if (canModify) ...[
               const SizedBox(height: 8),
@@ -599,23 +619,37 @@ class _CommentsSectionState extends State<_CommentsSection> {
                   TextButton(
                     onPressed: () => _startEdit(comment),
                     style: TextButton.styleFrom(
-                      foregroundColor: const Color(0xFF0F766E),
+                      foregroundColor: const Color(AppColors.primary),
                       padding: EdgeInsets.zero,
                       minimumSize: const Size(0, 0),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    child: const Text('Редактировать'),
+                    child: Text(
+                      'Редактировать',
+                      style: AppStyle.manrope(
+                        size: 13,
+                        weight: FontWeight.w500,
+                        color: const Color(AppColors.primary),
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 16),
                   TextButton(
                     onPressed: () => cubit.deleteOne(comment.id),
                     style: TextButton.styleFrom(
-                      foregroundColor: const Color(0xFFEF4444),
+                      foregroundColor: const Color(AppColors.red),
                       padding: EdgeInsets.zero,
                       minimumSize: const Size(0, 0),
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    child: const Text('Удалить'),
+                    child: Text(
+                      'Удалить',
+                      style: AppStyle.manrope(
+                        size: 13,
+                        weight: FontWeight.w500,
+                        color: const Color(AppColors.red),
+                      ),
+                    ),
                   ),
                 ],
               ),

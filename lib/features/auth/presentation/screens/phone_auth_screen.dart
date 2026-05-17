@@ -162,7 +162,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                           const SizedBox(height: 16),
                         ],
                         Text(
-                          'Авторизация',
+                          'Регистрация / Авторизация',
                           style: AppStyle.manrope(
                             size: 24,
                             weight: FontWeight.w600,
