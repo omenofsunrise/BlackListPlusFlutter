@@ -8,7 +8,6 @@ void main() {
     expect(File(Images.appIcon).existsSync(), isTrue);
     expect(File(Images.backgroundLogo).existsSync(), isTrue);
     expect(File(Images.error).existsSync(), isTrue);
-    expect(File(Images.waypayLogo).existsSync(), isTrue);
     expect(File(Images.whatsappLogo).existsSync(), isTrue);
   });
 }

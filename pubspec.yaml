@@ -51,7 +51,7 @@ dependencies:
   flutter_local_notifications: ^17.2.3
   timezone: ^0.9.4
   flutter_timezone: ^3.0.1
-  waypay_flutter_library:
+  chs_ui:
     path: packages/waypay_flutter_library
 
 dev_dependencies:

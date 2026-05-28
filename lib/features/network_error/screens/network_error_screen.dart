@@ -18,7 +18,7 @@ class NetworkErrorScreen extends StatelessWidget {
               'Ошибка подключения к сети',
               style: TextStyle(
                 fontSize: 18,
-                color: Color(0xFF007D88),
+                color: Color(0xFF2563EB),
                 fontWeight: FontWeight.w500,
               ),
             ),

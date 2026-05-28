@@ -61,7 +61,10 @@ class AppRouter {
         return null;
       }
       final isCalculatorRoute = here == Routes.calculatorScreen.toPath;
-      if (here == '/' || here == Routes.phoneAuthScreen.toPath || isCalculatorRoute) {
+      if (here == '/' || here == Routes.phoneAuthScreen.toPath) {
+        return Routes.statsScreen.toPath;
+      }
+      if (isCalculatorRoute) {
         try {
           final authDataSource = getIt<AuthRemoteDataSource>();
           final results = await Future.wait([
@@ -71,14 +74,11 @@ class AppRouter {
           final authInfo = results[0] as Map<String, dynamic>;
           final hasActive = results[1] as bool;
           final canUseCalculator = isUserModerated(authInfo) && hasActive;
-          if (!canUseCalculator && isCalculatorRoute) {
-            return Routes.blacklistScreen.toPath;
+          if (!canUseCalculator) {
+            return Routes.statsScreen.toPath;
           }
-          return canUseCalculator
-              ? Routes.calculatorScreen.toPath
-              : Routes.blacklistScreen.toPath;
         } catch (_) {
-          return Routes.blacklistScreen.toPath;
+          return Routes.statsScreen.toPath;
         }
       }
 
@@ -116,6 +116,24 @@ class AppRouter {
           StatefulShellBranch(
             routes: [
               GoRoute(
+                path: Routes.statsScreen.toPath,
+                name: Routes.statsScreen.toName,
+                builder: (context, state) => const StatsScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.templatesScreen.toPath,
+                name: Routes.templatesScreen.toName,
+                builder: (context, state) => const TemplatesScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
                 path: Routes.calculatorScreen.toPath,
                 name: Routes.calculatorScreen.toName,
                 builder: (context, state) => const CalculatorScreen(),
@@ -128,15 +146,6 @@ class AppRouter {
                 path: Routes.blacklistScreen.toPath,
                 name: Routes.blacklistScreen.toName,
                 builder: (context, state) => const BlackCatalogScreen(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: Routes.notificationsScreen.toPath,
-                name: Routes.notificationsScreen.toName,
-                builder: (context, state) => const NotificationsScreen(),
               ),
             ],
           ),
@@ -165,11 +174,6 @@ class AppRouter {
         },
       ),
       GoRoute(
-        path: Routes.templatesScreen.toPath,
-        name: Routes.templatesScreen.toName,
-        builder: (context, state) => const TemplatesScreen(),
-      ),
-      GoRoute(
         path: Routes.templateDetailScreen.toPath,
         name: Routes.templateDetailScreen.toName,
         builder: (context, state) {
@@ -183,9 +187,9 @@ class AppRouter {
         },
       ),
       GoRoute(
-        path: Routes.statsScreen.toPath,
-        name: Routes.statsScreen.toName,
-        builder: (context, state) => const StatsScreen(),
+        path: Routes.notificationsScreen.toPath,
+        name: Routes.notificationsScreen.toName,
+        builder: (context, state) => const NotificationsScreen(),
       ),
     ],
   );

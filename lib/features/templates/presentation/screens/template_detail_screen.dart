@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:waypay_flutter_library/waypay_styles.dart';
+import 'package:chs_ui/chs_styles.dart';
 
 class TemplateDetailScreen extends StatefulWidget {
   final DocumentTemplate template;

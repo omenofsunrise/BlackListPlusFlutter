@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:waypay_flutter_library/waypay_styles.dart';
+import 'package:chs_ui/chs_styles.dart';
 
 class DashboardInfoMiniCard extends StatelessWidget {
   final Color circleColor;

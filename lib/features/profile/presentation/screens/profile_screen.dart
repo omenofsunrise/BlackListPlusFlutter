@@ -4,7 +4,7 @@ import 'package:blacklist_plus_flutter/features/black_catalog/presentation/widge
 import 'package:blacklist_plus_flutter/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:waypay_flutter_library/waypay_styles.dart';
+import 'package:chs_ui/chs_styles.dart';
 
 class ProfileScreen extends StatefulWidget {
   final int? employeeId;
@@ -26,7 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   static const _bgGrey = Color(0xFFF6F8FA);
   static const _cardWhite = Colors.white;
-  static const _accentTeal = Color(0xFF007D88);
+  static const _accentBrand = Color(0xFF2563EB);
   static const _logoutRed = Color(0xFFDC3545);
   static const _logoutRedHover = Color(0xFFC82333);
   static const _textDark = Color(0xFF333333);
@@ -110,7 +110,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       phone: _phone,
                       avatarLetter: _avatarLetter,
                       cardColor: _cardWhite,
-                      avatarColor: _accentTeal,
+                      avatarColor: _accentBrand,
                       textColor: _textDark,
                       secondaryTextColor: _textGrey,
                       infoBg: _infoBg,
@@ -125,7 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       title: 'Статистика и долги',
                       subtitle:
                           'Стрик, активность и журнал долгов в рублях (локально)',
-                      onTap: () => context.pushNamed(
+                      onTap: () => context.goNamed(
                         Routes.statsScreen.toName,
                       ),
                     ),
@@ -134,7 +134,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       icon: Icons.description_outlined,
                       title: 'Шаблоны документов',
                       subtitle: 'Бланки расписки, акта и уведомления (.docx)',
-                      onTap: () => context.pushNamed(
+                      onTap: () => context.goNamed(
                         Routes.templatesScreen.toName,
                       ),
                     ),

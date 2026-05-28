@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:waypay_flutter_library/waypay_styles.dart';
+import 'package:chs_ui/chs_styles.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -229,7 +229,7 @@ class _NotificationCard extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             border: Border.all(
-              color: isRead ? const Color(0xFFE5E7EB) : const Color(0xFF007D88),
+              color: isRead ? const Color(0xFFE5E7EB) : const Color(0xFF2563EB),
             ),
             borderRadius: BorderRadius.circular(10),
           ),
@@ -258,7 +258,7 @@ class _NotificationCard extends StatelessWidget {
                         height: 28,
                         margin: const EdgeInsets.only(left: 8),
                         decoration: const BoxDecoration(
-                          color: Color(0xFF007D88),
+                          color: Color(0xFF2563EB),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(

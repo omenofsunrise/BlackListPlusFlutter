@@ -16,7 +16,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:waypay_flutter_library/waypay_styles.dart';
+import 'package:chs_ui/chs_styles.dart';
 
 class CalculatorScreen extends StatefulWidget {
   const CalculatorScreen({super.key});
@@ -360,14 +360,14 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 
     final doc = pw.Document();
 
-    const primary = PdfColor.fromInt(0xFF007D88);
-    const accent = PdfColor.fromInt(0xFF25CBA1);
+    const primary = PdfColor.fromInt(0xFF2563EB);
+    const accent = PdfColor.fromInt(0xFF60A5FA);
     const white = PdfColors.white;
     const textDark = PdfColor.fromInt(0xFF111827);
     const textGrey = PdfColor.fromInt(0xFF6B7280);
     const rowBorder = PdfColor.fromInt(0xFFE5E7EB);
-    const barDebt = PdfColor.fromInt(0xFF007D88);
-    const barOver = PdfColor.fromInt(0xFF25CBA1);
+    const barDebt = PdfColor.fromInt(0xFF2563EB);
+    const barOver = PdfColor.fromInt(0xFF60A5FA);
 
     final theme = pw.ThemeData.withFont(base: fontRegular, bold: fontBold);
 
@@ -874,7 +874,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
                       color: Color(AppColors.black),
                     ),
                     tooltip: 'Шаблоны документов',
-                    onPressed: () => context.pushNamed(
+                    onPressed: () => context.goNamed(
                       Routes.templatesScreen.toName,
                     ),
                   ),

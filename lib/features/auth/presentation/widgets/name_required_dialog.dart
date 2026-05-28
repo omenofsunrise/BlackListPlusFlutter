@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:waypay_flutter_library/waypay_styles.dart';
+import 'package:chs_ui/chs_styles.dart';
 
 Future<String?> showNameRequiredDialog(BuildContext context) {
   return showDialog<String>(

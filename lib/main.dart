@@ -70,11 +70,13 @@ class _MyAppState extends State<MyApp> {
           )
         : MaterialApp.router(
             debugShowCheckedModeBanner: false,
-            title: 'waypay_mobile',
+            title: 'ЧС+',
             builder: _appTextScaleBuilder,
             routerConfig: AppRouter.router,
             theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color(0xFF2563EB),
+              ),
               useMaterial3: true,
               scaffoldBackgroundColor: Colors.white,
               appBarTheme: const AppBarTheme(

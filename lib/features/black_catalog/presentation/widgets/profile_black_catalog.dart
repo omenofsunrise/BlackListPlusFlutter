@@ -6,7 +6,7 @@ import 'package:blacklist_plus_flutter/features/black_catalog/presentation/cubit
 import 'package:blacklist_plus_flutter/features/black_catalog/presentation/widgets/black_catalog_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:waypay_flutter_library/waypay_styles.dart';
+import 'package:chs_ui/chs_styles.dart';
 
 class ProfileBlackCatalog extends StatefulWidget {
   final int pageSize;
@@ -129,7 +129,7 @@ class _ProfileBlackCatalogState extends State<ProfileBlackCatalog> {
               child: const Icon(
                 Icons.person_outline,
                 size: 20,
-                color: Color(0xFF007D88),
+                color: Color(0xFF2563EB),
               ),
             ),
             const SizedBox(width: 12),

@@ -13,7 +13,7 @@ import 'package:blacklist_plus_flutter/routes/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:waypay_flutter_library/waypay_styles.dart';
+import 'package:chs_ui/chs_styles.dart';
 
 class BlackCatalogScreen extends StatefulWidget {
   const BlackCatalogScreen({super.key});
@@ -290,7 +290,7 @@ class _BlackCatalogScreenState extends State<BlackCatalogScreen> {
       child: Scaffold(
         backgroundColor: Colors.white,
         floatingActionButton: FloatingActionButton(
-          backgroundColor: const Color(0xFF007D88),
+          backgroundColor: const Color(0xFF2563EB),
           onPressed: _showAddMenu,
           child: const Icon(Icons.add, color: Colors.white),
         ),
@@ -318,10 +318,20 @@ class _BlackCatalogScreenState extends State<BlackCatalogScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Header(
+          Header(
             title: 'Чёрный список',
             showBackButton: true,
-            showNotifications: false,
+            showNotifications: true,
+            notificationsButton: IconButton(
+              onPressed: () =>
+                  context.pushNamed(Routes.notificationsScreen.toName),
+              icon: const Icon(
+                Icons.notifications_none,
+                color: Color(AppColors.black),
+              ),
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
           ),
           const SizedBox(height: 12),
           SearchField(

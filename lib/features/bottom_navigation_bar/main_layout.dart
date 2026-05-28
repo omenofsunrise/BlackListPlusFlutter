@@ -6,7 +6,7 @@ import 'package:blacklist_plus_flutter/features/auth/data/data_sources/auth_remo
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:waypay_flutter_library/waypay_styles.dart';
+import 'package:chs_ui/chs_styles.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key, required this.navigationShell});
@@ -21,10 +21,11 @@ class _MainLayoutState extends State<MainLayout> {
   late final Future<bool> _showCalculatorFuture;
 
   static const _navConfigs = [
-    _NavItemConfig(icon: SvgIcons.calculator, branchIndex: 0),
-    _NavItemConfig(icon: SvgIcons.notebook, branchIndex: 1),
-    _NavItemConfig(icon: SvgIcons.bell, branchIndex: 2),
-    _NavItemConfig(icon: SvgIcons.users, branchIndex: 3),
+    _NavItemConfig(icon: SvgIcons.book, branchIndex: 0),
+    _NavItemConfig(icon: SvgIcons.doc, branchIndex: 1),
+    _NavItemConfig(icon: SvgIcons.calculator, branchIndex: 2),
+    _NavItemConfig(icon: SvgIcons.notebook, branchIndex: 3),
+    _NavItemConfig(icon: SvgIcons.users, branchIndex: 4),
   ];
 
   @override
@@ -65,7 +66,7 @@ class _MainLayoutState extends State<MainLayout> {
               final items = showCalculator
                   ? _navConfigs
                   : _navConfigs
-                        .where((item) => item.branchIndex != 0)
+                        .where((item) => item.branchIndex != 2)
                         .toList();
               final currentUiIndex = items.indexWhere(
                 (item) => item.branchIndex == navigationShell.currentIndex,

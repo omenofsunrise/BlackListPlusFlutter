@@ -4,7 +4,7 @@ import 'package:blacklist_plus_flutter/features/calc/data/calculation_mode.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
-import 'package:waypay_flutter_library/waypay_styles.dart';
+import 'package:chs_ui/chs_styles.dart';
 
 class CalcPresetFormResult {
   final String title;

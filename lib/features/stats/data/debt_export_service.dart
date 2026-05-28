@@ -9,8 +9,8 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 class DebtExportService {
-  static const _kPrimary = PdfColor.fromInt(0xFF007D88);
-  static const _kAccent = PdfColor.fromInt(0xFF25CBA1);
+  static const _kPrimary = PdfColor.fromInt(0xFF2563EB);
+  static const _kAccent = PdfColor.fromInt(0xFF60A5FA);
   static const _kTextDark = PdfColor.fromInt(0xFF111827);
   static const _kTextGrey = PdfColor.fromInt(0xFF6B7280);
   static const _kRowBorder = PdfColor.fromInt(0xFFE5E7EB);
@@ -120,7 +120,7 @@ class DebtExportService {
       cell.cellStyle = CellStyle(
         bold: true,
         fontColorHex: ExcelColor.white,
-        backgroundColorHex: ExcelColor.fromHexString('FF007D88'),
+        backgroundColorHex: ExcelColor.fromHexString('FF2563EB'),
         horizontalAlign: HorizontalAlign.Center,
       );
     }

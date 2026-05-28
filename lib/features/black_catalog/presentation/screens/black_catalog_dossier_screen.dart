@@ -9,7 +9,7 @@ import 'package:blacklist_plus_flutter/features/black_catalog/presentation/cubit
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:waypay_flutter_library/waypay_styles.dart';
+import 'package:chs_ui/chs_styles.dart';
 
 class BlackCatalogDossierScreen extends StatefulWidget {
   final BlackCatalogItem initialItem;

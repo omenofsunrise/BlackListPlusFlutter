@@ -1,7 +1,7 @@
 import 'package:blacklist_plus_flutter/features/black_catalog/data/models/black_catalog_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:waypay_flutter_library/waypay_styles.dart';
+import 'package:chs_ui/chs_styles.dart';
 
 enum BlackCatalogAddOption { blacklist, completed }
 
