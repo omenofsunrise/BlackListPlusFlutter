@@ -1,9 +1,6 @@
 import 'dart:async';
 import 'package:blacklist_plus_flutter/core/di/dependency_injection.dart';
 import 'package:blacklist_plus_flutter/features/network_error/screens/network_error_screen.dart';
-import 'package:blacklist_plus_flutter/features/profile/presentation/bloc/employees_bloc.dart';
-import 'package:blacklist_plus_flutter/features/profile/presentation/cubit/credit_stats_cubit.dart';
-import 'package:blacklist_plus_flutter/features/profile/presentation/cubit/payment_stats_cubit.dart';
 import 'package:blacklist_plus_flutter/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:blacklist_plus_flutter/routes/app_router.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -128,9 +125,6 @@ class _MyAppState extends State<MyApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => getIt<ProfileCubit>()),
-        BlocProvider(create: (_) => getIt<EmployeesBloc>()),
-        BlocProvider(create: (_) => getIt<PaymentStatsCubit>()),
-        BlocProvider(create: (_) => getIt<CreditStatsCubit>()),
       ],
       child: app,
     );

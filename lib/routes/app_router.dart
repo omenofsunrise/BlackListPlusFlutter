@@ -11,12 +11,7 @@ import 'package:blacklist_plus_flutter/features/bottom_navigation_bar/main_layou
 import 'package:blacklist_plus_flutter/features/calc/calculator_page.dart';
 import 'package:blacklist_plus_flutter/features/info/privacy_policy_screen.dart';
 import 'package:blacklist_plus_flutter/features/info/screens/privacy_policy_intro_screen.dart';
-import 'package:blacklist_plus_flutter/features/profile/presentation/bloc/employees_bloc.dart';
-import 'package:blacklist_plus_flutter/features/profile/presentation/screens/active_sessions_screen.dart';
-import 'package:blacklist_plus_flutter/features/profile/presentation/screens/add_employee_screen.dart';
-import 'package:blacklist_plus_flutter/features/profile/presentation/screens/employees_screen.dart';
 import 'package:blacklist_plus_flutter/features/profile/presentation/screens/profile_screen.dart';
-import 'package:blacklist_plus_flutter/features/profile/presentation/screens/profile_statistics_screen.dart';
 import 'package:blacklist_plus_flutter/features/stats/presentation/screens/stats_screen.dart';
 import 'package:blacklist_plus_flutter/features/templates/data/document_template.dart';
 import 'package:blacklist_plus_flutter/features/templates/presentation/screens/template_detail_screen.dart';
@@ -155,37 +150,6 @@ class AppRouter {
             ],
           ),
         ],
-      ),
-      GoRoute(
-        path: Routes.profileActiveSessionsScreen.toPath,
-        name: Routes.profileActiveSessionsScreen.toName,
-        builder: (context, state) => const ActiveSessionsScreen(),
-      ),
-      GoRoute(
-        path: Routes.profileEmployeesScreen.toPath,
-        name: Routes.profileEmployeesScreen.toName,
-        builder: (context, state) => const EmployeesScreen(),
-      ),
-      GoRoute(
-        path: Routes.profileAddEmployeeScreen.toPath,
-        name: Routes.profileAddEmployeeScreen.toName,
-        builder: (context, state) {
-          final bloc = state.extra as EmployeesBloc?;
-          if (bloc == null) {
-            return const Scaffold(
-              body: Center(child: Text('Нет данных для создания')),
-            );
-          }
-          return AddEmployeeScreen(employeesBloc: bloc);
-        },
-      ),
-      GoRoute(
-        path: Routes.profileStatsScreen.toPath,
-        name: Routes.profileStatsScreen.toName,
-        builder: (context, state) {
-          final employeeId = state.extra as int?;
-          return ProfileStatisticsScreen(employeeId: employeeId);
-        },
       ),
       GoRoute(
         path: Routes.blackCatalogDossierScreen.toPath,

@@ -3,8 +3,6 @@ import 'package:blacklist_plus_flutter/core/widgets/app_dialog.dart';
 import 'package:blacklist_plus_flutter/features/auth/data/data_sources/auth_remote_data_source.dart';
 import 'package:flutter/material.dart';
 
-/// Совместимая обёртка над [showAppConfirmDialog].
-/// Оставлена для существующих вызовов; новый код используйте напрямую.
 Future<bool> showConfirmDialog({
   required BuildContext context,
   String title = 'Подтвердите удаление',

@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:waypay_flutter_library/waypay_styles.dart';
 
-/// Единый контейнер для модальных диалогов приложения.
-///
-/// Используется как обёртка для форм с полями ввода — обеспечивает
-/// одинаковый фон, скругление, типографику заголовка и отступы.
-///
-/// Для простого confirm/cancel — см. [showAppConfirmDialog].
 class AppDialog extends StatelessWidget {
   final String title;
   final Widget content;
@@ -44,7 +38,6 @@ class AppDialog extends StatelessWidget {
   }
 }
 
-/// Кнопка "Отмена" в едином стиле для actions диалога.
 class AppDialogCancelButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
@@ -71,10 +64,6 @@ class AppDialogCancelButton extends StatelessWidget {
   }
 }
 
-/// Показывает унифицированный диалог подтверждения с двумя кнопками.
-///
-/// Возвращает `true` если пользователь подтвердил, иначе `false`.
-/// Если [destructive] — кнопка подтверждения красная.
 Future<bool> showAppConfirmDialog({
   required BuildContext context,
   required String title,

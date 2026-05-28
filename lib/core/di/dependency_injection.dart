@@ -6,9 +6,6 @@ import 'package:blacklist_plus_flutter/features/black_catalog/data/data_sources/
 import 'package:blacklist_plus_flutter/features/black_catalog/data/data_sources/black_catalog_remote_data_source_impl.dart';
 import 'package:blacklist_plus_flutter/features/profile/data/data_sources/employee_remote_data_source.dart';
 import 'package:blacklist_plus_flutter/features/profile/data/data_sources/employee_remote_data_source_impl.dart';
-import 'package:blacklist_plus_flutter/features/profile/presentation/bloc/employees_bloc.dart';
-import 'package:blacklist_plus_flutter/features/profile/presentation/cubit/credit_stats_cubit.dart';
-import 'package:blacklist_plus_flutter/features/profile/presentation/cubit/payment_stats_cubit.dart';
 import 'package:blacklist_plus_flutter/features/calc/data/calc_preset_service.dart';
 import 'package:blacklist_plus_flutter/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:blacklist_plus_flutter/features/stats/data/debt_export_service.dart';
@@ -54,7 +51,4 @@ Future<void> initDependencies() async {
 
   getIt.registerFactory(() => AuthCubit());
   getIt.registerFactory(() => ProfileCubit());
-  getIt.registerFactory(() => EmployeesBloc());
-  getIt.registerFactory(() => PaymentStatsCubit());
-  getIt.registerFactory(() => CreditStatsCubit());
 }

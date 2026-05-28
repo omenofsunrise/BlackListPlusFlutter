@@ -9,7 +9,6 @@ import 'package:blacklist_plus_flutter/features/stats/data/local_debt.dart';
 import 'package:blacklist_plus_flutter/features/stats/data/local_debt_service.dart';
 import 'package:blacklist_plus_flutter/features/stats/data/local_stats_service.dart';
 import 'package:blacklist_plus_flutter/features/stats/presentation/widgets/add_local_debt_modal.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -183,112 +182,6 @@ class _StatsScreenState extends State<StatsScreen> {
     }
   }
 
-  Future<void> _showDebugSheet() async {
-    await showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: const Color(AppColors.white),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (ctx) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 8),
-            Container(
-              width: 36,
-              height: 4,
-              decoration: BoxDecoration(
-                color: const Color(AppColors.uncomfPayment),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Debug-меню',
-                style: AppStyle.manrope(
-                  size: 16,
-                  weight: FontWeight.w700,
-                  color: const Color(AppColors.black),
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            ListTile(
-              leading: const Icon(
-                Icons.dataset_outlined,
-                color: Color(AppColors.primary),
-              ),
-              title: const Text('Заполнить тестовыми данными'),
-              subtitle: const Text('6 долгов: активные, просроченные, оплаченные'),
-              onTap: () async {
-                Navigator.pop(ctx);
-                await getIt<DebtReminderService>().requestPermissionIfNeeded();
-                await _debts.seedTestData();
-                if (!mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Тестовые данные добавлены')),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(
-                Icons.delete_sweep_outlined,
-                color: Color(AppColors.red),
-              ),
-              title: const Text('Очистить журнал'),
-              subtitle: const Text('Удалит все записи и отменит уведомления'),
-              onTap: () async {
-                Navigator.pop(ctx);
-                await _debts.clearAll();
-                if (!mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Журнал очищен')),
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(
-                Icons.notifications_active_outlined,
-                color: Color(AppColors.primary),
-              ),
-              title: const Text('Тестовое уведомление через 10 сек'),
-              subtitle: const Text('Сверните приложение, чтобы увидеть банер'),
-              onTap: () async {
-                Navigator.pop(ctx);
-                final granted = await getIt<DebtReminderService>()
-                    .requestPermissionIfNeeded();
-                if (!mounted) return;
-                if (!granted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Разрешение на уведомления не выдано',
-                      ),
-                    ),
-                  );
-                  return;
-                }
-                await getIt<DebtReminderService>().scheduleTest(seconds: 10);
-                if (!mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Уведомление придёт через 10 секунд — сверните приложение',
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-  }
-
   Future<void> _confirmRemove(LocalDebt debt) async {
     final ok = await showAppConfirmDialog(
       context: context,
@@ -320,34 +213,20 @@ class _StatsScreenState extends State<StatsScreen> {
               showNotifications: false,
               showAvatar: false,
               onBackPressed: () => Navigator.of(context).maybePop(),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: SvgPicture.asset(
-                      SvgIcons.share,
-                      width: 24,
-                      height: 24,
-                      colorFilter: ColorFilter.mode(
-                        _debts.debts.isEmpty
-                            ? const Color(AppColors.borderColor)
-                            : const Color(AppColors.black),
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    tooltip: 'Экспорт журнала',
-                    onPressed: _debts.debts.isEmpty ? null : _showExportSheet,
+              trailing: IconButton(
+                icon: SvgPicture.asset(
+                  SvgIcons.share,
+                  width: 24,
+                  height: 24,
+                  colorFilter: ColorFilter.mode(
+                    _debts.debts.isEmpty
+                        ? const Color(AppColors.borderColor)
+                        : const Color(AppColors.black),
+                    BlendMode.srcIn,
                   ),
-                  if (kDebugMode)
-                    IconButton(
-                      icon: const Icon(
-                        Icons.bug_report_outlined,
-                        color: Color(AppColors.uiBorder),
-                      ),
-                      tooltip: 'Debug',
-                      onPressed: _showDebugSheet,
-                    ),
-                ],
+                ),
+                tooltip: 'Экспорт журнала',
+                onPressed: _debts.debts.isEmpty ? null : _showExportSheet,
               ),
             ),
           ),

@@ -333,7 +333,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
 
       final dir = await getTemporaryDirectory();
       final filename =
-          'WayPay-raschet-${DateFormat('dd.MM.yyyy').format(DateTime.now())}.pdf';
+          'ChS-Plus-raschet-${DateFormat('dd.MM.yyyy').format(DateTime.now())}.pdf';
       final file = File('${dir.path}/$filename');
       await file.writeAsBytes(bytes, flush: true);
 
@@ -736,7 +736,7 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
           card(
             pw.Center(
               child: pw.Text(
-                '© ${DateTime.now().year} WayPay. Все права защищены.',
+                '© ${DateTime.now().year} ЧС+. Все права защищены.',
                 style: pw.TextStyle(fontSize: 12, color: textGrey),
               ),
             ),
@@ -787,14 +787,16 @@ class _CalculatorScreenState extends State<CalculatorScreen> {
   }
 
   void _calculate() {
+    final ws = RegExp(r'\s');
     final amount =
-        double.tryParse(_sumController.text.replaceAll(' ', '')) ?? 0;
-    final months = int.tryParse(_monthsController.text) ?? 1;
+        double.tryParse(_sumController.text.replaceAll(ws, '')) ?? 0;
+    final months = int.tryParse(_monthsController.text.replaceAll(ws, '')) ?? 1;
     final initial =
-        double.tryParse(_initialController.text.replaceAll(' ', '')) ?? 0;
-    final percent = double.tryParse(_percentController.text) ?? 0;
+        double.tryParse(_initialController.text.replaceAll(ws, '')) ?? 0;
+    final percent =
+        double.tryParse(_percentController.text.replaceAll(ws, '')) ?? 0;
     final round =
-        double.tryParse(_roundController.text.replaceAll(' ', '')) ?? 0;
+        double.tryParse(_roundController.text.replaceAll(ws, '')) ?? 0;
 
     if (months < 1 || months > 360) return;
 

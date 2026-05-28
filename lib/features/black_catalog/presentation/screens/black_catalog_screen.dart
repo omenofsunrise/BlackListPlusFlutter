@@ -28,17 +28,6 @@ class _BlackCatalogScreenState extends State<BlackCatalogScreen> {
   Timer? _debounce;
 
   String? _currentUserId;
-  bool _isPrivilegedUser = false;
-
-  static const _privilegedUserIds = {
-    'b3873201-0ae4-44ff-ba1f-de55daf8318b', // Аюб
-    'bcec9c2b-5cee-4a1c-aac6-d0336ef59802', // Ибрагим
-    'e57d8bdf-77f2-4e07-b54a-4044754da41d', // Второй номер Ибрагима
-    '01eb28db-609b-4906-9423-aa4b65f622cf', // Микиев Турпал
-    '221bf643-573e-4e61-be7b-8557d462743f', // Элипханов Идрис
-    '354ab5e9-3446-4380-811e-ff93df5d2f01', // Кирилл
-    'a8f2d5a2-48d8-45ae-8dd7-de43de1d8fd4', // Элипханов Исаак Якубович
-  };
 
   @override
   void initState() {
@@ -67,13 +56,11 @@ class _BlackCatalogScreenState extends State<BlackCatalogScreen> {
       if (!mounted) return;
       setState(() {
         _currentUserId = id;
-        _isPrivilegedUser = _privilegedUserIds.contains(id);
       });
     } catch (_) {}
   }
 
   bool _canEditItem(BlackCatalogItem item) {
-    if (_isPrivilegedUser) return true;
     if (_currentUserId == null || _currentUserId!.isEmpty) return false;
     if (item.creatorId == null || item.creatorId!.isEmpty) return false;
     return item.creatorId == _currentUserId;

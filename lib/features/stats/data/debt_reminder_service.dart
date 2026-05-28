@@ -8,8 +8,6 @@ import 'package:intl/intl.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
-/// Локальные напоминания о датах возврата долга.
-/// Планирует пуш за день до dueDate в 10:00 утра по локальному времени.
 class DebtReminderService {
   static const _channelId = 'debt_reminders';
   static const _channelName = 'Напоминания о долгах';
@@ -46,9 +44,6 @@ class DebtReminderService {
     _initialized = true;
   }
 
-  /// Запрашивает у пользователя разрешение на уведомления.
-  /// На iOS показывает системный диалог, на Android (13+) — runtime permission.
-  /// Возвращает true, если пользователь дал согласие.
   Future<bool> requestPermissionIfNeeded() async {
     await init();
     if (Platform.isIOS) {
@@ -69,8 +64,6 @@ class DebtReminderService {
     return false;
   }
 
-  /// Планирует уведомление за день до dueDate в 10:00 утра.
-  /// Если dueDate в прошлом или уже в течение ближайших 24 часов — не планирует.
   Future<void> schedule(LocalDebt debt) async {
     await init();
     if (debt.dueDate == null || debt.isPaid) return;
@@ -130,7 +123,6 @@ class DebtReminderService {
     await _plugin.cancelAll();
   }
 
-  /// Только для отладки: показывает тестовое уведомление через [seconds] секунд.
   Future<void> scheduleTest({int seconds = 10}) async {
     await init();
     final fire = tz.TZDateTime.now(tz.local).add(Duration(seconds: seconds));
@@ -184,8 +176,6 @@ class DebtReminderService {
     return DateFormat('dd.MM.yyyy', 'ru').format(dueDate);
   }
 
-  /// debt.id — строка из microsecondsSinceEpoch.toString(),
-  /// нужен int в пределах int32 для notifications.
   int _idFor(String debtId) {
     final n = int.tryParse(debtId);
     if (n == null) return debtId.hashCode & 0x7fffffff;

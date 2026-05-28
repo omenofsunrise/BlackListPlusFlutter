@@ -123,7 +123,6 @@ class LocalDebtService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Только для отладки: очищает журнал и отменяет все запланированные напоминания.
   Future<void> clearAll() async {
     for (final d in _debts) {
       unawaited(_reminders.cancel(d.id));
@@ -133,7 +132,6 @@ class LocalDebtService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Только для отладки: заполняет журнал набором реалистичных тестовых записей.
   Future<void> seedTestData() async {
     final now = DateTime.now();
     final samples = <LocalDebt>[
